@@ -3,4 +3,4 @@
 
 redo-ifchange madelua
 
-cp $LUA_BUILD/src/liblua.a $3
+cp $LUA_BUILD/src/luac $3
