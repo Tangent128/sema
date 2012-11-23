@@ -1,7 +1,7 @@
 
 . ./vars
 
-rm liblua.a luac madelua
+rm -f *.a *.h lua luac madelua
 
 # clean lua dir too
 (
