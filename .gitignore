@@ -1,4 +1,11 @@
 *.o
 *.a
-.redo/*
+*.luac
+*.luac.c
 lua-5.2.1/*
+liblua/*.h
+liblua/lua
+liblua/luac
+liblua/madelua
+.redo/*
+.do_built*
