@@ -1,0 +1,31 @@
+
+# Initial configuration; variables like CC & LD
+# may be overriden in the generated ./config file
+
+# C compiler command
+CC="gcc -Wall -c"
+
+# linker command
+LD="gcc -Wall"
+
+
+# Libpath-related C flags
+LIBS="-llua -lm"
+
+# Lua dependencies
+LUADEP_INC="../liblua/lua.h ../liblua/lualib.h ../liblua/lauxlib.h ../liblua/luaconf.h"
+LUADEP_LIB="liblua/liblua.a"
+LUAINC="-I../liblua"
+LUALIB="-Lliblua"
+
+# utility functions, likely no need to edit
+OUTFILE=$3
+compile() {
+	redo-ifchange $LUADEP_INC $*
+	$CC $LUAINC $* -o $OUTFILE
+}
+
+link() {
+	redo-ifchange $LUADEP_LIB $*
+	$LD $LUALIB $* $LIBS -o $OUTFILE
+}

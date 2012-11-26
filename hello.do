@@ -1,7 +1,10 @@
 
-# not very portable, just for testing
+# for testing
 
-redo-ifchange liblua/liblua.a liblua/lua.h liblua/lualib.h liblua/lauxlib.h liblua/luaconf.h
-redo-ifchange src/hello.c build/hello.luac.c
+redo-ifchange config.base config
 
-gcc -Wall -Iliblua -Lliblua src/hello.c -o $3 -llua -lm
+. ./config.base
+. ./config
+
+link build/hello.luac.o build/hello.o
+
