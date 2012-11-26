@@ -9,3 +9,4 @@ liblua/luac
 liblua/madelua
 .redo/*
 .do_built*
+*~
