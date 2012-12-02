@@ -6,4 +6,6 @@ redo-ifchange config.base config
 . ./config.base
 . ./config
 
-link 
+B=build
+
+link $B/main.luac.o $B/main.o
