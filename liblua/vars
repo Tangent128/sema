@@ -5,4 +5,4 @@ exec 1>&2
 # rebuild if this changed
 redo-ifchange vars
 
-LUA_BUILD=../lua-5.2.1
+LUA_BUILD=lua-5.2.1

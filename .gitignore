@@ -3,7 +3,7 @@ config
 *.a
 *.luac
 *.luac.c
-lua-5.2.1/*
+liblua/lua-5.2.1/*
 liblua/*.h
 liblua/lua
 liblua/luac
