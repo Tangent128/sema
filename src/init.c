@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <lua.h>
 #include <lauxlib.h>
-#include "resources.h"
 
 static int modeFork(lua_State *L) {
 	
@@ -39,8 +38,8 @@ static const luaL_Reg initFuncs[] = {
 	{ NULL, NULL }
 };
 
-void loadInitFuncs(lua_State *L) {
+int luaopen_init(lua_State *L) {
 	luaL_newlib(L, initFuncs);
-	lua_setglobal(L, "init");
+	return 1;
 }
 

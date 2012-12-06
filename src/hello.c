@@ -1,14 +1,16 @@
 
 #include <lua.h>
+#include <lualib.h>
 #include <lauxlib.h>
 
 // include "../build/hello.luac.c"
 
-extern char res_hello_luac[];
-extern int res_hello_luac_size;
 
 int main(int argc, char** argv) {
 	
+extern char res_hello_luac[];
+extern int res_hello_luac_size;
+
 	lua_State *L = luaL_newstate();
 	luaL_openlibs(L);
 	

@@ -4,18 +4,19 @@
 #include <lauxlib.h>
 #include "resources.h"
 
-// from init.c
-void loadInitFuncs(lua_State *L);
-
 int main(int argc, char** argv) {
 	
 	lua_State *L = luaL_newstate();
 	luaL_openlibs(L);
 	
 	// load C functions
-	loadInitFuncs(L);	
+	OPEN_LUA_C_LIB(L, init)
+	//OPEN_LUA_C_LIB(L, poll)
 	
-	// load initial Lua code
+	// load Lua functions
+	//RUN_LUA_CHUNK(L, poll)
+	
+	// load entry Lua code
 	LOAD_LUA_CHUNK(L, main)
 	
 	int i;

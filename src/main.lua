@@ -12,9 +12,17 @@ if args[1] == "--server" then
 	mode = "server"
 end
 
+-- check socket
+local socketPath = nil
+-- try SEMA_SOCKET
+-- try $HOME/.sema/control.socket
+
+if not socketPath then
+	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")
+end
+
 
 -- fork if need be
-
 if mode == "spawn" then
 	mode = init.modeFork()
 end
