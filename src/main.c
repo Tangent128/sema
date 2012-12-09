@@ -11,10 +11,12 @@ int main(int argc, char** argv) {
 	
 	// load C functions
 	OPEN_LUA_C_LIB(L, init)
-	//OPEN_LUA_C_LIB(L, poll)
+	OPEN_LUA_C_LIB(L, pollSet)
 	
 	// load Lua functions
 	//RUN_LUA_CHUNK(L, poll)
+	RUN_LUA_CHUNK(L, supervise)
+	RUN_LUA_CHUNK(L, control)
 	
 	// load entry Lua code
 	LOAD_LUA_CHUNK(L, main)

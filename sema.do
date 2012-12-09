@@ -8,4 +8,6 @@ redo-ifchange config.base config
 
 B=build
 
-link $B/main.luac.o $B/init.o $B/main.o
+link $B/main.luac.o $B/supervise.luac.o $B/control.luac.o \
+$B/pollSet.o $B/init.o \
+$B/main.o

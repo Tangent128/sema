@@ -1,4 +1,8 @@
 
+--[[
+     S E T T I N G S
+--]]
+
 local args = { select(2, ... ) } -- trim off argv[0]
 
 local mode = "spawn"
@@ -6,14 +10,19 @@ local mode = "spawn"
 -- server = run as server, managing daemon-supervising coroutines
 -- client = run as client, sending command to server
 
+local socketPath
+-- path of client/server connection socket
+
 -- parse arguments
 
 if args[1] == "--server" then
 	mode = "server"
 end
 
--- check socket
-local socketPath = nil
+--[[
+     S O C K E T   C H E C K
+--]]
+
 -- try SEMA_SOCKET
 -- try $HOME/.sema/control.socket
 
@@ -21,6 +30,10 @@ if not socketPath then
 	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")
 end
 
+
+--[[
+     K I C K O F F
+--]]
 
 -- fork if need be
 if mode == "spawn" then
@@ -30,9 +43,9 @@ end
 -- start appropriate code path
 
 if mode == "client" then
-	print "start client"
+	control.main()
 elseif mode == "server" then
-	print "start server"
+	supervise.main()
 else
 	error("Somehow got an invalid mode: "..mode)
 end
