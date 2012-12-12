@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 	OPEN_LUA_C_LIB(L, pollSet)
 	
 	// load Lua functions
-	//RUN_LUA_CHUNK(L, poll)
+	//RUN_LUA_CHUNK(L, pollSet)
 	RUN_LUA_CHUNK(L, supervise)
 	RUN_LUA_CHUNK(L, control)
 	

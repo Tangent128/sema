@@ -1,5 +1,8 @@
 
 #include <unistd.h>
+#include <signal.h>
+#include <sys/signalfd.h>
+
 #include <lua.h>
 #include <lauxlib.h>
 
@@ -33,8 +36,33 @@ static int modeFork(lua_State *L) {
 	
 }
 
+// TODO: move to signals module
+static int fdSignals = -1;
+static int makeSignalFd(lua_State *L) {
+	
+	sigset_t signalSet;
+	
+	sigemptyset(&signalSet);
+	sigaddset(&signalSet, SIGCHLD);
+	sigaddset(&signalSet, SIGALRM);
+	sigaddset(&signalSet, SIGHUP);
+	
+	sigprocmask(SIG_BLOCK, &signalSet, NULL);
+	
+	fdSignals = signalfd(fdSignals, &signalSet, SFD_CLOEXEC);
+	
+	if(fdSignals == -1) {
+		perror("makeSignalFd");
+		return luaL_error(L, "Couldn't create signalfd");
+	}
+	
+	lua_pushinteger(L, fdSignals);
+	return 1;
+}
+
 static const luaL_Reg initFuncs[] = {
 	{ "modeFork", &modeFork },
+	{ "makeSignalFd", &makeSignalFd },
 	{ NULL, NULL }
 };
 
