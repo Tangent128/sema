@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <poll.h>
-#include <sys/signalfd.h>
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -63,6 +62,7 @@ int poll_drop_fd(lua_State *L) {
 	return 0;
 }
 
+// TODO: move this mapping to the Lua level
 static void pushReasonName(lua_State *L, int reason) {
 	switch(reason) {
 		case FD_POLL_FOR_SIGNAL:
@@ -79,13 +79,6 @@ static void pushReasonName(lua_State *L, int reason) {
 	}
 }
 
-// TODO: move to signals module
-static int readSignal(int fd) {
-	struct signalfd_siginfo buffer;
-	read(fd, &buffer, sizeof(buffer));
-	
-	return buffer.ssi_signo;
-}
 
 static int doPoll(lua_State *L) {
 	
@@ -114,11 +107,11 @@ static int doPoll(lua_State *L) {
 				lua_settable(L, -3);
 				
 				// set signal if relevant
-				if(why == FD_POLL_FOR_SIGNAL) {
-					lua_pushstring(L, "signal");
-					lua_pushinteger(L, readSignal(fd));
-					lua_settable(L, -3);
-				}
+				//if(why == FD_POLL_FOR_SIGNAL) {
+				//	lua_pushstring(L, "signal");
+				//	lua_pushinteger(L, readSignal(fd));
+				//	lua_settable(L, -3);
+				//}
 				
 				// add record to result table
 				lua_settable(L, -3);
