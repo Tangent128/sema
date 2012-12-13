@@ -4,16 +4,19 @@
 #include <poll.h>
 #include <sys/signalfd.h>
 
-
 #include <lua.h>
 #include <lauxlib.h>
-#include "pollSet.h"
 
 static struct pollfd *fds = NULL;
 static int *reasons = NULL;
 static int nfds = 0;
 static int size = 1;
 
+// reasons a given FD may be queued
+// TODO: move this mapping to the Lua level
+#define	FD_POLL_FOR_SIGNAL	0
+#define	FD_POLL_FOR_LISTEN	1
+#define	FD_POLL_FOR_READ	2
 static const char* watchTypes[] = {
 	[FD_POLL_FOR_SIGNAL] = "signal",
 	[FD_POLL_FOR_LISTEN] = "listen",
@@ -55,6 +58,8 @@ int poll_add_fd(lua_State *L) {
 }
 
 int poll_drop_fd(lua_State *L) {
+	// TODO: implement
+	luaL_error(L, "poll_drop_fd unimplemented");
 	return 0;
 }
 
@@ -134,7 +139,7 @@ static const luaL_Reg pollFuncs[] = {
 	{ NULL, NULL }
 };
 
-int luaopen_pollSet(lua_State *L) {
+int luaopen_poll(lua_State *L) {
 	luaL_newlib(L, pollFuncs);
 	return 1;
 }
