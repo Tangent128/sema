@@ -11,7 +11,7 @@ static int *reasons = NULL;
 static int nfds = 0;
 static int size = 1;
 
-int poll_add_fd(lua_State *L) {
+static int poll_add_fd(lua_State *L) {
 	
 	// check size/initialize list
 	if(nfds >= size || fds == NULL) {
@@ -44,7 +44,7 @@ int poll_add_fd(lua_State *L) {
 	return 0;
 }
 
-int poll_drop_fd(lua_State *L) {
+static int poll_drop_fd(lua_State *L) {
 	// TODO: implement
 	luaL_error(L, "poll_drop_fd unimplemented");
 	return 0;

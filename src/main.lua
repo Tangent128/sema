@@ -23,8 +23,9 @@ end
      S O C K E T   C H E C K
 --]]
 
--- try SEMA_SOCKET
--- try $HOME/.sema/control.socket
+-- try --socket if given, failing if given but invalid
+-- else try SEMA_SOCKET
+-- else try $HOME/.sema/control.socket
 
 if not socketPath then
 	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")

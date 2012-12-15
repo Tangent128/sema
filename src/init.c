@@ -13,7 +13,7 @@ static int modeFork(lua_State *L) {
 	}
 	
 	// normally, the forked child process becomes the server,
-	// so as to disappear with the shell
+	// so as to disappear from the shell
 	int isServer = (result == 0);
 	
 	// reverse this for PID 1, so that init doesn't exit
