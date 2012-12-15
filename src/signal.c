@@ -45,8 +45,20 @@ static const luaL_Reg signalFuncs[] = {
 	{ NULL, NULL }
 };
 
+#define REGISTER_SIGNAL(signal) \
+	lua_pushstring(L, #signal); \
+	lua_pushinteger(L, signal); \
+	lua_settable(L, -3);
+
 int luaopen_signal(lua_State *L) {
 	luaL_newlib(L, signalFuncs);
+	
+	REGISTER_SIGNAL(SIGALRM);
+	REGISTER_SIGNAL(SIGCHLD);
+	REGISTER_SIGNAL(SIGHUP);
+	REGISTER_SIGNAL(SIGTERM);
+	// TODO: more
+	
 	return 1;
 }
 

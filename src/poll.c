@@ -11,18 +11,6 @@ static int *reasons = NULL;
 static int nfds = 0;
 static int size = 1;
 
-// reasons a given FD may be queued
-// TODO: move this mapping to the Lua level
-#define	FD_POLL_FOR_SIGNAL	0
-#define	FD_POLL_FOR_LISTEN	1
-#define	FD_POLL_FOR_READ	2
-static const char* watchTypes[] = {
-	[FD_POLL_FOR_SIGNAL] = "signal",
-	[FD_POLL_FOR_LISTEN] = "listen",
-	[FD_POLL_FOR_READ] = "read",
-	NULL
-};
-
 int poll_add_fd(lua_State *L) {
 	
 	// check size/initialize list
@@ -34,7 +22,7 @@ int poll_add_fd(lua_State *L) {
 	
 	// read params (fd, why)
 	int fd = luaL_checkint(L, 1);
-	int why = luaL_checkoption(L, 2, NULL, watchTypes);
+	int why = luaL_checkint(L, 2);
 	
 	// check for existing fd
 	int i;
@@ -62,23 +50,6 @@ int poll_drop_fd(lua_State *L) {
 	return 0;
 }
 
-// TODO: move this mapping to the Lua level
-static void pushReasonName(lua_State *L, int reason) {
-	switch(reason) {
-		case FD_POLL_FOR_SIGNAL:
-				lua_pushstring(L, "signal");
-			break;
-		case FD_POLL_FOR_LISTEN:
-				lua_pushstring(L, "listen");
-			break;
-		case FD_POLL_FOR_READ:
-				lua_pushstring(L, "read");
-			break;
-		default:
-			luaL_error(L, "Invalid fd type in pollSet");
-	}
-}
-
 
 static int doPoll(lua_State *L) {
 	
@@ -102,16 +73,9 @@ static int doPoll(lua_State *L) {
 				lua_settable(L, -3);
 				
 				// set reason-for-watching code
-				lua_pushstring(L, "type");
-				pushReasonName(L, why);
+				lua_pushstring(L, "reason");
+				lua_pushinteger(L, why);
 				lua_settable(L, -3);
-				
-				// set signal if relevant
-				//if(why == FD_POLL_FOR_SIGNAL) {
-				//	lua_pushstring(L, "signal");
-				//	lua_pushinteger(L, readSignal(fd));
-				//	lua_settable(L, -3);
-				//}
 				
 				// add record to result table
 				lua_settable(L, -3);
@@ -126,9 +90,9 @@ static int doPoll(lua_State *L) {
 }
 
 static const luaL_Reg pollFuncs[] = {
-	{ "addFd", &poll_add_fd },
-	{ "dropFd", &poll_drop_fd },
-	{ "doPoll", &doPoll },
+	{ "cAddFd", &poll_add_fd },
+	{ "cDropFd", &poll_drop_fd },
+	{ "cDoPoll", &doPoll },
 	{ NULL, NULL }
 };
 

@@ -11,15 +11,12 @@ function supervise.main()
 	
 	--loop forever
 	while true do
-		local fds = poll.doPoll()
-		for k, v in ipairs(fds) do
-			print(v.fd, v.type, v.signal)
-			
-			if(v.type == "signal") then
-				local sig = signal.readSignal(v.fd)
-				print("Signal #" .. sig)
-			end
+		local events = poll.events()
+		
+		if events.signals[signal.SIGCHLD] then
+			print "reap"
 		end
+		
 	end
 end
 
