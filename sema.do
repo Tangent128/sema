@@ -10,5 +10,5 @@ B=build
 
 link $B/main.luac.o $B/supervise.luac.o $B/control.luac.o \
 $B/poll.luac.o \
-$B/signal.o $B/poll.o $B/init.o \
+$B/signal.o $B/children.o $B/poll.o $B/init.o \
 $B/main.o

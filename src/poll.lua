@@ -14,7 +14,8 @@ end
 
 function poll.events()
 	local result = {
-		signals = {}
+		signals = {},
+		children = {}
 	}
 	
 	-- collect events
@@ -33,7 +34,7 @@ function poll.events()
 	for k, v in pairs(result.signals) do
 		
 		if k == signal.SIGCHLD then
-			--TODO: wait for children
+			result.children = children.wait()
 		end
 	end
 
