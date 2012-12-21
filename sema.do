@@ -9,6 +9,6 @@ redo-ifchange config.base config
 B=build
 
 link $B/main.luac.o $B/supervise.luac.o $B/control.luac.o \
-$B/poll.luac.o \
+$B/poll.luac.o $B/queue.luac.o \
 $B/signal.o $B/children.o $B/poll.o $B/init.o \
 $B/main.o
