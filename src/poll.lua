@@ -9,7 +9,7 @@ end
 
 function poll.addFd(fd, reason)
 	poll.cAddFd(fd, reasonIndex[reason])
-	print("add", fd, reason, reasonIndex[reason])
+	--print("add", fd, reason, reasonIndex[reason])
 end
 
 function poll.events()

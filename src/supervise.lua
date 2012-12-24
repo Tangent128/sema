@@ -14,13 +14,9 @@ function supervise.main()
 			while true do
 				n = n + 1
 				local pid = children.run("echo", name..n)
-				--print"echoing"
 				queue.waitPid(pid)
-				--print"waitEcho"
 				pid = children.run("sleep", period)
-				--print"sleeping"
 				queue.waitPid(pid)
-				--print"slept"
 			end
 		end
 	end

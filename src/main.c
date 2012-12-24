@@ -56,9 +56,10 @@ int main(int argc, char** argv) {
 	// load entry Lua code
 	LOAD_LUA_CHUNK(L, main)
 	
+	lua_checkstack(L, argc);
+	
 	int i;
 	for(i = 0; i < argc; i++) {
-		lua_checkstack(L, 1);
 		lua_pushstring(L, argv[i]);
 	}
 	
