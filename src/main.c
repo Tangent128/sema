@@ -50,6 +50,7 @@ int main(int argc, char** argv) {
 	// load Lua functions
 	RUN_LUA_CHUNK(L, poll)
 	RUN_LUA_CHUNK(L, queue)
+	RUN_LUA_CHUNK(L, script)
 	RUN_LUA_CHUNK(L, supervise)
 	RUN_LUA_CHUNK(L, control)
 	

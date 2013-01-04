@@ -14,25 +14,32 @@ local function deactivate(thread)
 	activeSet[thread] = nil
 end
 
-function queue.enqueue(func)
-	local thread
-	thread = coroutine.create(function()
-		func()
+function queue.enqueue(thread)
+	local co
+	co = thread.coroutine or coroutine.create(function()
+		thread.func()
 		-- cleanup
-		deactivate(thread)
+		deactivate(co)
 	end)
+	thread.coroutine = co
 	activate(thread)
 end
 
+-- assumption: the thread dispatch loop is non-reentrant
+local activeThread
 function queue.runActive()
 	for thread in pairs(activeSet) do
-		local ok, err = coroutine.resume(thread)
+		activeThread = thread
+		local ok, err = coroutine.resume(thread.coroutine)
 		if not ok then
 			print(err)
 		end
 	end
 end
 
+function queue.getActive()
+	return activeThread
+end
 
 --[[
      Threads blocked on child processes
@@ -42,9 +49,9 @@ local pidBlocked = {}
 
 -- assumption: only one thread can wait on a given PID
 function queue.waitPid(pid)
-	local thread = coroutine.running()
-	pidBlocked[pid] = thread
-	deactivate(thread)
+	--activeThread declared above
+	pidBlocked[pid] = activeThread
+	deactivate(activeThread)
 	coroutine.yield()
 end
 

@@ -9,16 +9,17 @@ function supervise.main()
 	
 	--queue debug threads
 	local function test(name, period)
-		return function()
+		local x_ENV = script.makeEnv()
+		return script.makeThread(function()
 			local n = 0
 			while true do
 				n = n + 1
-				local pid = children.run("echo", name..n)
+				local pid = children.run("echo", x_ENV.threadName()..n)
 				queue.waitPid(pid)
 				pid = children.run("sleep", period)
 				queue.waitPid(pid)
 			end
-		end
+		end, name)
 	end
 	queue.enqueue(test("A", 3))
 	queue.enqueue(test("B", 5))
