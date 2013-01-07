@@ -21,6 +21,15 @@ function api.threadName()
 	return queue.getActive().name
 end
 
+function api.run(tbl, ...)
+	if type(tbl) ~= "table" then
+		return api.run{tbl, ...}
+	end
+	
+	local pid = children.run(table.unpack(tbl))
+	queue.waitPid(pid)
+end	
+
 --[[
      supervisor-side API
 --]]

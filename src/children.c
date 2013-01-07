@@ -9,16 +9,21 @@
 static int run(lua_State *L) {
 	
 	// check arguments
+	// args: (argv...)
 	
 	int argc = lua_gettop(L);
+	int i = 1;
 	
-	if(argc < 1) {
+
+	// argv
+	
+	if(argc < i) {
 		return luaL_error(L, "No command provided to run.");
 	}
 	
-	int i;
-	for(i = 0; i < argc; i++) {
-		luaL_checkstring(L, i+1);
+	int argvStart = i;
+	for(; i <= argc; i++) {
+		luaL_checkstring(L, i);
 	}
 	
 	// OK, sanity check done, prepare child
@@ -40,8 +45,8 @@ static int run(lua_State *L) {
 	//typedef char * ConstString;
 	const char ** argv = malloc((argc + 1) * sizeof(char*));
 	
-	for(i = 0; i < argc; i++) {
-		argv[i] = luaL_checkstring(L, i+1);
+	for(i = argvStart; i <= argc; i++) {
+		argv[i-1] = luaL_checkstring(L, i);
 	}
 	argv[argc] = NULL;
 	
