@@ -17,8 +17,10 @@ local env_mt = {}
 local api = {}
 env_mt.__index = api
 
+local current = queue.getActive
+
 function api.threadName()
-	return queue.getActive().name
+	return current().name
 end
 
 function api.run(tbl, ...)
@@ -28,7 +30,10 @@ function api.run(tbl, ...)
 	
 	local pid = children.run(table.unpack(tbl))
 	queue.waitPid(pid)
+	return current().pidExitStatus
 end	
+
+api.print = print
 
 --[[
      supervisor-side API

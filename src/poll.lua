@@ -12,14 +12,14 @@ function poll.addFd(fd, reason)
 	--print("add", fd, reason, reasonIndex[reason])
 end
 
-function poll.events()
+function poll.events(block)
 	local result = {
 		signals = {},
 		children = {}
 	}
 	
 	-- collect events
-	local readableFds = poll.cDoPoll()
+	local readableFds = poll.cDoPoll(block)
 	for k, v in pairs(readableFds) do
 		local reason = reasons[v.reason]
 		

@@ -53,10 +53,18 @@ static int poll_drop_fd(lua_State *L) {
 
 static int doPoll(lua_State *L) {
 	
-	int result = poll(fds, nfds, -1);
+	int result;
+	int block = lua_toboolean(L, 1);
+	
+	if(block) {
+		result = poll(fds, nfds, -1);
+	} else {
+		result = poll(fds, nfds, 0);
+	}
+	
+	lua_createtable(L, result, 0);
 	
 	if(result > 0) {
-		lua_createtable(L, result, 0);
 		
 		int i, resultIndex = 1;
 		for(i = 0; i < nfds; i++) {
@@ -83,10 +91,9 @@ static int doPoll(lua_State *L) {
 			}
 		}
 		
-		return 1;
-	} else {
-		return 0;
 	}
+	
+	return 1;
 }
 
 static const luaL_Reg pollFuncs[] = {
