@@ -1,0 +1,30 @@
+TODO:
+
+client/server socket
+load code from socket
+unload code?
+
+==== alpha?
+
+get abs. file names (realpath?)
+resolve file names to socket path (use common prefix & dots?)
+load scripts from files
+unload files for sure
+
+==== beta?
+
+send commands to scripts
+down mode
+
+==== v0.9
+
+wait for given time
+
+==== v1.0
+
+use?
+socket activation?
+inotify?
+metrics?
+log pipe?
+
