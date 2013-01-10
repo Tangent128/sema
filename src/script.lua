@@ -13,6 +13,7 @@ thread_mt.__index = thread_mt
      (script-side API)
 --]]
 
+-- env metatable needs to be seperate from index table to prevent accessing it via __index
 local env_mt = {}
 local api = {}
 env_mt.__index = api
@@ -36,16 +37,31 @@ end
 api.print = print
 
 --[[
-     supervisor-side API
+     script metatable
 --]]
 
-function script.makeThread(func, name)
+local script_mt = {}
+script_mt.__index = script_mt
+
+function script_mt:makeThread(func, name)
 	local thread = setmetatable({
+		script = self,
 		name = name,
 		func = func
 	}, thread_mt)
 	
 	return thread
+end
+
+--[[
+     supervisor-side API
+--]]
+
+function script.makeScript()
+	local context = setmetatable({
+		env = script.makeEnv()
+	}, script_mt)
+	return context
 end
 
 function script.makeEnv()

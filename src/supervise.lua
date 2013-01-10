@@ -9,9 +9,9 @@ function supervise.main()
 	
 	--queue debug threads
 	local function test(name, period)
-		local makeThread = script.makeThread
-		local _ENV = script.makeEnv()
-		return makeThread(function()
+		local script = script.makeScript()
+		local _ENV = script.env
+		return script:makeThread(function()
 			local n = 0
 			while true do
 				n = n + 1
