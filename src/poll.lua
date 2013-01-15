@@ -12,6 +12,10 @@ function poll.addFd(fd, reason)
 	--print("add", fd, reason, reasonIndex[reason])
 end
 
+function poll.dropFd(fd)
+	poll.cDropFd(fd)
+end
+
 function poll.events(block)
 	local result = {
 		signals = {},
