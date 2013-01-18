@@ -1,6 +1,8 @@
 TODO:
 
 client/server socket
+unlink server socket when *server* closes
+pass messages
 load code from socket
 unload code?
 

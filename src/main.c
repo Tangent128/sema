@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
 	OPEN_LUA_C_LIB(L, signal)
 	OPEN_LUA_C_LIB(L, children)
 	OPEN_LUA_C_LIB(L, poll)
+	OPEN_LUA_C_LIB(L, socket)
 	
 	// load Lua functions
 	RUN_LUA_CHUNK(L, poll)
@@ -53,6 +54,7 @@ int main(int argc, char** argv) {
 	RUN_LUA_CHUNK(L, script)
 	RUN_LUA_CHUNK(L, supervise)
 	RUN_LUA_CHUNK(L, control)
+	RUN_LUA_CHUNK(L, socket)
 	
 	// load entry Lua code
 	LOAD_LUA_CHUNK(L, main)

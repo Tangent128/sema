@@ -31,14 +31,21 @@ if not socketPath then
 	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")
 end
 
-
 --[[
      K I C K O F F
 --]]
 
 -- fork if need be
 if mode == "spawn" then
-	mode = init.modeFork()
+	
+	if socket.grabClientSocket() then
+		mode = "client"
+		print(socket.grabClientSocket() .. "=sock")
+	else
+		-- get server socket ready
+		socket.grabServerSocket()
+		mode = init.modeFork()
+	end
 end
 
 -- start appropriate code path

@@ -4,6 +4,8 @@ supervise = {}
 function supervise.main()
 	print "start server"
 	
+	--socket.grabServerSocket()
+	
 	local signalFd = signal.makeSignalFd();
 	poll.addFd(signalFd, "signal")
 	
