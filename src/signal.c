@@ -15,6 +15,7 @@ static int makeSignalFd(lua_State *L) {
 	sigaddset(&signalSet, SIGCHLD);
 	sigaddset(&signalSet, SIGALRM);
 	sigaddset(&signalSet, SIGHUP);
+	sigaddset(&signalSet, SIGINT);
 	
 	sigprocmask(SIG_BLOCK, &signalSet, NULL);
 	
@@ -57,6 +58,7 @@ int luaopen_signal(lua_State *L) {
 	REGISTER_SIGNAL(SIGCHLD);
 	REGISTER_SIGNAL(SIGHUP);
 	REGISTER_SIGNAL(SIGTERM);
+	REGISTER_SIGNAL(SIGINT);
 	// TODO: more
 	
 	return 1;

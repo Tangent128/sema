@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
 	OPEN_LUA_C_LIB(L, socket)
 	
 	// load Lua functions
+	RUN_LUA_CHUNK(L, exit)
 	RUN_LUA_CHUNK(L, poll)
 	RUN_LUA_CHUNK(L, queue)
 	RUN_LUA_CHUNK(L, script)

@@ -39,7 +39,10 @@ function poll.events(block)
 		
 		if k == signal.SIGCHLD then
 			result.children = children.wait()
+		elseif k == signal.SIGINT or k == signal.SIGTERM then
+			exit.shutdown()
 		end
+		
 	end
 
 	

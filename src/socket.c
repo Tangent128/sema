@@ -38,10 +38,14 @@ static int grabServerSocket(lua_State *L) {
 		return luaL_error(L, "Couldn't listen on server socket");
 	}
 	
-	//TODO: arrange to delete socket when done (where?)
-	
 	lua_pushinteger(L, server);
 	return 1;
+}
+
+static int unlinkServerSocket(lua_State *L) {
+	const char *path = luaL_checkstring(L, 1);
+	// TODO: test unlink
+	return 0;
 }
 
 static int grabClientSocket(lua_State *L) {

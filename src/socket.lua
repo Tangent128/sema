@@ -1,7 +1,12 @@
 
+local socketPath = nil
 function socket.getSocketPath()
-	return "./sema.socket"
-	--return os.getenv("HOME")..
+	if socketPath then
+		return socketPath
+	end
+	--os.getenv("HOME")..
+	socketPath = "./sema.socket"
+	return socketPath
 end
 
 local clientFd = nil
@@ -19,6 +24,14 @@ function socket.grabServerSocket()
 		return serverFd
 	end
 	serverFd = socket.cGrabServerSocket(socket.getSocketPath())
+	exit.addHook(socket.serverShutdown)
 	return serverFd
+end
+
+function socket.serverShutdown()
+	if serverFd then
+		--TODO: unlink fds
+		print "server shutdown"
+	end
 end
 
