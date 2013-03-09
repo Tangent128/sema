@@ -31,7 +31,7 @@ end
 function socket.serverShutdown()
 	if serverFd then
 		--TODO: unlink fds
-		print "server shutdown"
+		socket.cUnlink(socket.getSocketPath())
 	end
 end
 

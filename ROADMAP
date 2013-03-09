@@ -1,14 +1,12 @@
 TODO:
 
-client/server socket
-unlink server socket when *server* closes
 pass messages
-load code from socket
+load code from socket?
 unload code?
 
 ==== alpha?
 
-get abs. file names (realpath?)
+get abs. file names (realpath?) char *abspath = realpath(path, NULL); free(abspath)
 load scripts from files
 unload files for sure
 

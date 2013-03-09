@@ -42,9 +42,9 @@ static int grabServerSocket(lua_State *L) {
 	return 1;
 }
 
-static int unlinkServerSocket(lua_State *L) {
+static int unlinkL(lua_State *L) {
 	const char *path = luaL_checkstring(L, 1);
-	// TODO: test unlink
+	unlink(path);
 	return 0;
 }
 
@@ -101,6 +101,7 @@ static int writeToConnection(lua_State *L) {
 static const luaL_Reg socketFuncs[] = {
 	{ "cGrabServerSocket", &grabServerSocket },
 	{ "cGrabClientSocket", &grabClientSocket },
+	{ "cUnlink", &unlinkL },
 	{ NULL, NULL }
 };
 
