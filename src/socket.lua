@@ -28,6 +28,14 @@ function socket.grabServerSocket()
 	return serverFd
 end
 
+--to only be run when the fd is readable to avoid process blocking!
+function socket.accept(serverFd)
+	--TODO: decide if queue.waitFd(serverFd) goes here or is caller's job
+	return socket.cAccept(serverFd)
+end
+
+--TODO: send/receive messages (message = list of strings)
+
 function socket.serverShutdown()
 	if serverFd then
 		--TODO: unlink fds

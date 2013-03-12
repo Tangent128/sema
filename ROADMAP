@@ -1,6 +1,7 @@
 TODO:
 
-pass messages
+socket connection (client connect already works?)
+pass messages (read/write socket)
 load code from socket?
 unload code?
 

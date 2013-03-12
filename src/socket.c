@@ -79,13 +79,22 @@ static int grabClientSocket(lua_State *L) {
 }
 
 static int acceptConnection(lua_State *L) {
-	lua_pushnil(L);
+
+	int serverSocket = luaL_checkinteger(L, 1);
+
+	int newConnection = accept(serverSocket, NULL, NULL);
+	
+	lua_pushinteger(L, newConnection);
 	return 1;
 }
 
 static int closeConnection(lua_State *L) {
-	lua_pushnil(L);
-	return 1;
+	
+	int fd = luaL_checkinteger(L, 1);
+	
+	close(fd);
+	
+	return 0;
 }
 
 static int readFromConnection(lua_State *L) {
@@ -99,9 +108,15 @@ static int writeToConnection(lua_State *L) {
 }
 
 static const luaL_Reg socketFuncs[] = {
+	/* wrapped in socket.lua */
 	{ "cGrabServerSocket", &grabServerSocket },
 	{ "cGrabClientSocket", &grabClientSocket },
+	{ "cAccept", &acceptConnection },
 	{ "cUnlink", &unlinkL },
+	
+	/* for use by any module */
+	{ "close", &closeConnection }, // close(fd)
+	
 	{ NULL, NULL }
 };
 

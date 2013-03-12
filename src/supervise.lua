@@ -4,10 +4,11 @@ supervise = {}
 function supervise.main()
 	print "start server"
 	
-	socket.grabServerSocket()
+	local serverFd = socket.grabServerSocket()
 	
 	local signalFd = signal.makeSignalFd();
 	poll.addFd(signalFd, "signal")
+	poll.addFd(serverFd, "read")
 	
 	--queue debug threads
 	local function test(name, period)
@@ -25,6 +26,19 @@ function supervise.main()
 	end
 	queue.enqueue(test("A", 3))
 	queue.enqueue(test("B", 5))
+
+	--TODO: write & enqueue worker thread that listens to socket & handles messages
+	local accepter = script.makeScript()
+	queue.enqueue(accepter:makeThread(function()
+		print "server awaiting connections"
+		while true do
+			queue.waitFd(serverFd)
+			local accepted = socket.accept(serverFd)
+			print("accepted fd "..accepted)
+			socket.close(accepted)
+			print("closed fd "..accepted)
+		end
+	end, "accept()"))
 
 	queue.eventLoopMain()
 	

@@ -1,6 +1,6 @@
 
 local reasons = {
-	"signal", "listen", "read"
+	"signal", "read"
 }
 local reasonIndex = {}
 for k,v in pairs(reasons) do
@@ -19,7 +19,8 @@ end
 function poll.events(block)
 	local result = {
 		signals = {},
-		children = {}
+		children = {},
+		fds = {},
 	}
 	
 	-- collect events
@@ -30,6 +31,8 @@ function poll.events(block)
 		if reason == "signal" then
 			local sig = signal.readSignal(v.fd)
 			result.signals[sig] = true
+		elseif reason == "read" then
+			result.fds[v.fd] = true
 		elseif false then
 		end
 	end
@@ -40,6 +43,7 @@ function poll.events(block)
 		if k == signal.SIGCHLD then
 			result.children = children.wait()
 		elseif k == signal.SIGINT or k == signal.SIGTERM then
+			--TODO: hard shutdown on SIGQUIT, else send exit command to all scripts and wait for all exit
 			exit.shutdown()
 		end
 		
