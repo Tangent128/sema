@@ -5,7 +5,9 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <sys/un.h>
+#include <stdint.h>
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -72,7 +74,7 @@ static int grabClientSocket(lua_State *L) {
 		perror("connect");
 		return luaL_error(L, "Couldn't connect client socket");
 	}
-	
+	printf("%d\n", result);
 	
 	lua_pushinteger(L, client);
 	return 1;
@@ -98,12 +100,42 @@ static int closeConnection(lua_State *L) {
 }
 
 static int readFromConnection(lua_State *L) {
-	lua_pushnil(L);
+	
+	int fd = luaL_checkinteger(L, 1);
+	
+	
+	
 	return 1;
 }
 
 static int writeToConnection(lua_State *L) {
-	lua_pushnil(L);
+	
+	int fd = luaL_checkinteger(L, 1);
+	
+	
+	
+	return 0;
+}
+
+
+/* functions to read & format 32-bit network-byte-order unsigned int fields, given as bytestrings */
+static int readNetworkInt(lua_State *L) {
+	size_t len;
+	const char* bytes = luaL_checklstring(L, 1, &len);
+	if(len < 4) {
+		return luaL_error(L, "need a 4-byte string argument");
+	}
+	
+	const uint32_t *netNum = (const uint32_t*) bytes;
+	lua_pushunsigned(L, ntohl(*netNum));
+	return 1;
+}
+
+static int formatNetworkInt(lua_State *L) {
+
+	uint32_t hostNum = luaL_checkunsigned(L, 1);
+	uint32_t netNum = htonl(hostNum);
+	lua_pushlstring(L, (char *) &netNum, sizeof(netNum));
 	return 1;
 }
 
@@ -114,7 +146,9 @@ static const luaL_Reg socketFuncs[] = {
 	{ "cAccept", &acceptConnection },
 	{ "cUnlink", &unlinkL },
 	
-	/* for use by any module */
+	/* no wrapping needed */
+	{ "readNetworkInt", &readNetworkInt }, // readNetworkInt(4-bytes)
+	{ "formatNetworkInt", &formatNetworkInt }, // formatNetworkInt(uint)
 	{ "close", &closeConnection }, // close(fd)
 	
 	{ NULL, NULL }

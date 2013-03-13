@@ -17,6 +17,8 @@ local socketPath
 
 if args[1] == "--server" then
 	mode = "server"
+elseif args[1] == "--client" then
+	mode = "client"
 end
 
 --[[
@@ -30,6 +32,7 @@ end
 if not socketPath then
 	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")
 end
+--TODO: this goes in socket module?
 
 --[[
      K I C K O F F

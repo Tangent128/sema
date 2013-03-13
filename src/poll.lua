@@ -39,10 +39,10 @@ function poll.events(block)
 	
 	-- handle certain signal events
 	for k, v in pairs(result.signals) do
-		
+	
 		if k == signal.SIGCHLD then
 			result.children = children.wait()
-		elseif k == signal.SIGINT or k == signal.SIGTERM then
+		elseif (k == signal.SIGINT) or (k == signal.SIGTERM) then
 			--TODO: hard shutdown on SIGQUIT, else send exit command to all scripts and wait for all exit
 			exit.shutdown()
 		end

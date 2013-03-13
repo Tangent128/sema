@@ -16,6 +16,7 @@ static int makeSignalFd(lua_State *L) {
 	sigaddset(&signalSet, SIGALRM);
 	sigaddset(&signalSet, SIGHUP);
 	sigaddset(&signalSet, SIGINT);
+	sigaddset(&signalSet, SIGTERM);
 	
 	sigprocmask(SIG_BLOCK, &signalSet, NULL);
 	

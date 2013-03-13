@@ -35,10 +35,17 @@ function socket.accept(serverFd)
 end
 
 --TODO: send/receive messages (message = list of strings)
+function socket.sendMessage(fd, message)
+	
+end
+
+function socket.receiveMessage(fd)
+	
+end
+
 
 function socket.serverShutdown()
 	if serverFd then
-		--TODO: unlink fds
 		socket.cUnlink(socket.getSocketPath())
 	end
 end
