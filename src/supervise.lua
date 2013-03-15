@@ -32,9 +32,10 @@ function supervise.main()
 	queue.enqueue(accepter:makeThread(function()
 		print "server awaiting connections"
 		while true do
-			queue.waitFd(serverFd)
+			--TODO: proper thread creation, not blocking the accept while reading commands
 			local accepted = socket.accept(serverFd)
 			print("accepted fd "..accepted)
+			socket.receiveMessage(accepted)
 			socket.close(accepted)
 			print("closed fd "..accepted)
 		end

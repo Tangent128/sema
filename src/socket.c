@@ -103,7 +103,14 @@ static int readFromConnection(lua_State *L) {
 	
 	int fd = luaL_checkinteger(L, 1);
 	
+	char buffer[256];
+	size_t len = read(fd, buffer, sizeof(buffer));
 	
+	if(len == 0) {
+		/* TODO: what on socket close? An error, since message lengths are known? Nil? Empty string (current behavior)? */
+	}
+	
+	lua_pushlstring(L, buffer, len);
 	
 	return 1;
 }
@@ -111,8 +118,10 @@ static int readFromConnection(lua_State *L) {
 static int writeToConnection(lua_State *L) {
 	
 	int fd = luaL_checkinteger(L, 1);
+	// get string to write (L, 2)
 	
-	
+	//TODO: be serious
+	write(fd, "Hello World", 11);
 	
 	return 0;
 }
@@ -144,13 +153,14 @@ static const luaL_Reg socketFuncs[] = {
 	{ "cGrabServerSocket", &grabServerSocket },
 	{ "cGrabClientSocket", &grabClientSocket },
 	{ "cAccept", &acceptConnection },
+	{ "cRead", &readFromConnection },
+	{ "cWrite", &writeToConnection },
+	{ "cClose", &closeConnection },
 	{ "cUnlink", &unlinkL },
 	
 	/* no wrapping needed */
 	{ "readNetworkInt", &readNetworkInt }, // readNetworkInt(4-bytes)
 	{ "formatNetworkInt", &formatNetworkInt }, // formatNetworkInt(uint)
-	{ "close", &closeConnection }, // close(fd)
-	
 	{ NULL, NULL }
 };
 

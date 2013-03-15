@@ -5,6 +5,7 @@ function control.main()
 	print "start client"
 	
 	local clientFd = socket.grabClientSocket()
+	socket.sendMessage(clientFd, {"dummy", "arg"})
 	
 	print(socket.readNetworkInt("\0\0\0\x10"));
 	print(socket.readNetworkInt("\x40\x41\x42\x43"));

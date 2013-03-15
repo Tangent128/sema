@@ -28,19 +28,41 @@ function socket.grabServerSocket()
 	return serverFd
 end
 
---to only be run when the fd is readable to avoid process blocking!
+--to only be run from a blockable coroutine!
 function socket.accept(serverFd)
-	--TODO: decide if queue.waitFd(serverFd) goes here or is caller's job
-	return socket.cAccept(serverFd)
+	queue.waitFd(serverFd)
+	
+	local clientFd = socket.cAccept(serverFd)
+	poll.addFd(clientFd, "read")
+	
+	return clientFd
+end
+
+function socket.close(fd)
+	poll.dropFd(fd)
+	socket.cClose(fd)
 end
 
 --TODO: send/receive messages (message = list of strings)
 function socket.sendMessage(fd, message)
-	
+	--format message body
+	--format message header
+	socket.cWrite(fd);
 end
 
-function socket.receiveMessage(fd)
+local function readBlock(fd)
+	queue.waitFd(fd)
 	
+	--TODO: handle nothing to read
+	return socket.cRead(fd)
+end
+
+--to only be run from a blockable coroutine!
+function socket.receiveMessage(fd)
+print(readBlock(fd))
+	--read message header
+	--read message body
+	--parse message body
 end
 
 
