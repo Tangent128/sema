@@ -1,7 +1,5 @@
 TODO:
 
-socket connection (client connect already works?)
-pass messages (read/write socket)
 load code from socket?
 unload code?
 
@@ -15,6 +13,8 @@ unload files for sure
 
 send commands to scripts
 down mode
+check TODOs
+double check for error conditions/memory leaks/fd leaks
 
 ==== v0.9
 

@@ -118,10 +118,10 @@ static int readFromConnection(lua_State *L) {
 static int writeToConnection(lua_State *L) {
 	
 	int fd = luaL_checkinteger(L, 1);
-	// get string to write (L, 2)
+	size_t len;
+	const char *message = luaL_checklstring (L, 2, &len);
 	
-	//TODO: be serious
-	write(fd, "Hello World", 11);
+	write(fd, message, len);
 	
 	return 0;
 }

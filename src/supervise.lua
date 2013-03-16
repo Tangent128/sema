@@ -7,8 +7,9 @@ function supervise.main()
 	local serverFd = socket.grabServerSocket()
 	
 	local signalFd = signal.makeSignalFd();
+	
+	--TODO: move to better place?
 	poll.addFd(signalFd, "signal")
-	poll.addFd(serverFd, "read")
 	
 	--queue debug threads
 	local function test(name, period)
@@ -32,10 +33,12 @@ function supervise.main()
 	queue.enqueue(accepter:makeThread(function()
 		print "server awaiting connections"
 		while true do
-			--TODO: proper thread creation, not blocking the accept while reading commands
+			--TODO: proper thread creation, not blocking the accept while reading commands, remember that thread needs to close accepted socket even when an error condition happens
 			local accepted = socket.accept(serverFd)
 			print("accepted fd "..accepted)
-			socket.receiveMessage(accepted)
+			local message = socket.receiveMessage(accepted)
+			message[#message + 1] = "added echo"
+			socket.sendMessage(accepted, message)
 			socket.close(accepted)
 			print("closed fd "..accepted)
 		end

@@ -5,19 +5,27 @@ function control.main()
 	print "start client"
 	
 	local clientFd = socket.grabClientSocket()
-	socket.sendMessage(clientFd, {"dummy", "arg"})
-	
-	print(socket.readNetworkInt("\0\0\0\x10"));
-	print(socket.readNetworkInt("\x40\x41\x42\x43"));
-	print(socket.formatNetworkInt(1078018627))
-	
 	
 	if not clientFd then
 		print "Could not connect to server."
 		exit.shutdown()
 	end
 	
-	--TODO: write test packet to server
+	local reader = script.makeScript()
+	queue.enqueue(reader:makeThread(function()
+		socket.sendMessage(clientFd, {"dummy", "arg", "1234567890asdfghjkl1234567890poiuytrewq"})
+
+		local message = socket.receiveMessage(clientFd)
+
+		print(#message)
+
+		for i=1,#message do
+			print(#(message[i]), message[i])
+		end
+
+	end, "read()"))
+
+	queue.eventLoopMain()
 	
 	print "done client"
 end
