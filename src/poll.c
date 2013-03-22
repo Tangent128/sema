@@ -45,8 +45,29 @@ static int poll_add_fd(lua_State *L) {
 }
 
 static int poll_drop_fd(lua_State *L) {
-	// TODO: implement
-	luaL_error(L, "poll_drop_fd unimplemented");
+
+	// read param
+	int fd = luaL_checkint(L, 1);
+	
+	// find fd
+	int i;
+	for(i = 0; i < nfds; i++) {
+		if(fds[i].fd == fd) {
+			// found it, can drop it
+			
+			// decrement list size
+			nfds--;
+			
+			// rescue fd at end of list by
+			// replacing dropped fd with it
+			fds[i].fd = fds[nfds].fd;
+			reasons[i] = reasons[nfds];
+			
+			return 0;
+		}
+	}
+
+	// didn't find it, work's already done
 	return 0;
 }
 

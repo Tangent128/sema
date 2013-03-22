@@ -1,17 +1,18 @@
 TODO:
 
-load code from socket?
-unload code?
-
-==== alpha?
+socket path
 
 get abs. file names (realpath?) char *abspath = realpath(path, NULL); free(abspath)
 load scripts from files
-unload files for sure
+unload files + killall
+
+==== alpha?
+
+send signals to scripts
+send commands to scripts
 
 ==== beta?
 
-send commands to scripts
 down mode
 check TODOs
 double check for error conditions/memory leaks/fd leaks
