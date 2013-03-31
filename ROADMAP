@@ -1,8 +1,6 @@
 TODO:
 
-socket path
-
-get abs. file names (realpath?) char *abspath = realpath(path, NULL); free(abspath)
+get abs. file names
 load scripts from files
 unload files + killall
 
