@@ -6,6 +6,8 @@ function socket.getSocketPath()
 	end
 
 	--TODO: base default off $HOME? or?
+	-- $HOME/.sema/control.socket ?
+	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")
 	socketPath = os.getenv("SEMA_SOCKET") or "./sema.socket"
 	
 	local dir, name = socketPath:match("^(.-/?)([^/]-)$")
@@ -51,7 +53,7 @@ function socket.grabServerSocket()
 
 	if serverFd then
 		poll.addFd(serverFd, "read")
-		exit.addHook(socket.serverShutdown)
+		aux.addExitHook(socket.serverShutdown)
 	end
 
 	return serverFd

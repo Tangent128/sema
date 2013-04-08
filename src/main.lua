@@ -10,9 +10,6 @@ local mode = "spawn"
 -- server = run as server, managing daemon-supervising coroutines
 -- client = run as client, sending command to server
 
-local socketPath
--- path of client/server connection socket
-
 -- parse arguments
 
 if args[1] == "--server" then
@@ -22,28 +19,18 @@ elseif args[1] == "--client" then
 end
 
 --[[
-     S O C K E T   C H E C K
---]]
-
--- try --socket if given, failing if given but invalid
--- else try SEMA_SOCKET
--- else try $HOME/.sema/control.socket
-
-if not socketPath then
-	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")
-end
---TODO: this goes in socket module?
-
---[[
      K I C K O F F
 --]]
+
+-- last-minute initialization
+local signalFd = signal.makeSignalFd();
+poll.addFd(signalFd, "signal")
 
 -- fork if need be
 if mode == "spawn" then
 	
 	if socket.grabClientSocket() then
 		mode = "client"
-		print(socket.grabClientSocket() .. "=sock")
 	else
 		-- get server socket ready
 		socket.grabServerSocket()

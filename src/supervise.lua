@@ -6,11 +6,6 @@ function supervise.main()
 	
 	local serverFd = socket.grabServerSocket()
 	
-	local signalFd = signal.makeSignalFd();
-	
-	--TODO: move to better place?
-	poll.addFd(signalFd, "signal")
-	
 	--queue debug threads
 	local function test(name, period)
 		local script = script.makeScript()
@@ -37,6 +32,12 @@ function supervise.main()
 			local accepted = socket.accept(serverFd)
 			print("accepted fd "..accepted)
 			local message = socket.receiveMessage(accepted)
+			
+			for i=1,#message do
+				print("arg", #(message[i]), message[i])
+			end
+
+			
 			message[#message + 1] = "added echo"
 			socket.sendMessage(accepted, message)
 			socket.close(accepted)

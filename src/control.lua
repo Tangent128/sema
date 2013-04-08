@@ -17,10 +17,10 @@ function control.main()
 
 		local message = socket.receiveMessage(clientFd)
 
-		print(#message)
+	--	print(#message)
 
 		for i=1,#message do
-			print(#(message[i]), message[i])
+			print("arg", #(message[i]), message[i])
 		end
 
 	end, "read()"))

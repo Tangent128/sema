@@ -9,34 +9,6 @@ local thread_mt = {}
 thread_mt.__index = thread_mt
 
 --[[
-     SCRIPT _ENV metatable
-     (script-side API)
---]]
-
--- env metatable needs to be seperate from index table to prevent accessing it via __index
-local env_mt = {}
-local api = {}
-env_mt.__index = api
-
-local current = queue.getActive
-
-function api.threadName()
-	return current().name
-end
-
-function api.run(tbl, ...)
-	if type(tbl) ~= "table" then
-		return api.run{tbl, ...}
-	end
-	
-	local pid = children.run(table.unpack(tbl))
-	queue.waitPid(pid)
-	return current().pidExitStatus
-end	
-
-api.print = print
-
---[[
      script metatable
 --]]
 
@@ -63,6 +35,11 @@ function script.makeScript()
 	}, script_mt)
 	return context
 end
+
+-- script _ENV metatable
+-- needs to be seperate from index table (defined in api.lua) to prevent accessing it via __index
+local env_mt = {}
+env_mt.__index = api
 
 function script.makeEnv()
 	local env = setmetatable({}, env_mt)

@@ -1,5 +1,8 @@
 TODO:
 
+script command dispatch
+ls scripts
+killall for script
 get abs. file names
 load scripts from files
 unload files + killall

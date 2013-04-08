@@ -13,7 +13,7 @@
 #include <lauxlib.h>
 
 static int absPath(lua_State *L) {
-// TODO: move to misc. utils module at some point, has non-socket uses
+// TODO: move to osaux module at some point, has non-socket uses
 	const char *relative = luaL_checkstring(L, 1);
 	
 	char *absolute = realpath(relative, NULL);
@@ -90,7 +90,7 @@ static int grabClientSocket(lua_State *L) {
 		perror("connect");
 		return luaL_error(L, "Couldn't connect client socket");
 	}
-	printf("%d\n", result);
+	//printf("%d\n", result);
 	
 	lua_pushinteger(L, client);
 	return 1;
