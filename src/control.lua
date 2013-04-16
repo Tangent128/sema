@@ -8,7 +8,7 @@ function control.main()
 	
 	if not clientFd then
 		print "Could not connect to server."
-		exit.shutdown()
+		aux.shutdown()
 	end
 	
 	local reader = script.makeScript()
