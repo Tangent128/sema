@@ -137,7 +137,14 @@ static int writeToConnection(lua_State *L) {
 	size_t len;
 	const char *message = luaL_checklstring (L, 2, &len);
 	
-	write(fd, message, len);
+	size_t result = write(fd, message, len);
+	
+	if(result == -1) {
+		if(errno == EPIPE) {
+			return luaL_error(L, "Connection closed before message sent.");
+		}
+		return luaL_error(L, "Unknown socket write error.");
+	}
 	
 	return 0;
 }

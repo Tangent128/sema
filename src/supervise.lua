@@ -30,27 +30,35 @@ function supervise.main()
 
 	local function connectionHandler(fd)
 		return function()
-			local message = socket.receiveMessage(fd)
-		
-			for i=1,#message do
-				print("arg", #(message[i]), message[i])
-			end
+			
+			local ok, err = pcall(function()
+			
+				local message = socket.receiveMessage(fd)
+				
+				for i=1,#message do
+					print("arg", #(message[i]), message[i])
+				end
 
 		
-			message[#message + 1] = "added echo"
+				message[#message + 1] = "added echo"
 			
-			supervisor.env.run{"sleep", 3}
+				supervisor.env.run{"sleep", 3}
 			
-			socket.sendMessage(fd, message)
+				socket.sendMessage(fd, message)
+			
+			end)
+			
 			socket.close(fd)
 			print("closed fd "..fd)
+			
+			if not ok then error(err) end
+			
 		end
 	end
 	
 	local function acceptLoop()
 		print "server awaiting connections"
 		while true do
-			--TODO: proper thread creation, not blocking the accept while reading commands, remember that thread needs to close accepted socket even when an error condition happens
 			local accepted = socket.accept(serverFd)
 			print("accepted fd "..accepted)
 			
