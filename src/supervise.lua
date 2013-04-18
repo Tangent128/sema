@@ -9,7 +9,7 @@ function supervise.main()
 	-- "script" representing core duties
 	local supervisor = script.makeScript()
 	
-	--queue debug threads
+	--[[queue debug threads
 	local function debugSuperviseSleep(period)
 		local _ENV = supervisor.env
 		return function()
@@ -27,33 +27,23 @@ function supervise.main()
 	end
 	queue.enqueue(test("A", 3))
 	queue.enqueue(test("B", 5))
+	--]]
 
 	local function connectionHandler(fd)
-		return function()
 			
-			local ok, err = pcall(function()
-			
-				local message = socket.receiveMessage(fd)
-				
-				for i=1,#message do
-					print("arg", #(message[i]), message[i])
-				end
-
+		local message = socket.receiveMessage(fd)
 		
-				message[#message + 1] = "added echo"
-			
-				supervisor.env.run{"sleep", 3}
-			
-				socket.sendMessage(fd, message)
-			
-			end)
-			
-			socket.close(fd)
-			print("closed fd "..fd)
-			
-			if not ok then error(err) end
-			
+		for i=1,#message do
+			print("arg", #(message[i]), message[i])
 		end
+
+
+		message[#message + 1] = "added echo"
+	
+		supervisor.env.run{"sleep", 3}
+	
+		socket.sendMessage(fd, message)
+		
 	end
 	
 	local function acceptLoop()
@@ -62,7 +52,16 @@ function supervise.main()
 			local accepted = socket.accept(serverFd)
 			print("accepted fd "..accepted)
 			
-			queue.enqueue(supervisor:makeThread(connectionHandler(accepted), "fd "..accepted))
+			-- create thread to handle this connection
+			queue.enqueue(supervisor:makeThread(function()
+			
+				local ok, err = pcall(connectionHandler, accepted)
+				
+				socket.close(accepted)
+				print("closed fd "..accepted)
+				if not ok then error(err) end
+				
+			end, "fd "..accepted))
 		end
 	end
 	queue.enqueue(supervisor:makeThread(acceptLoop, "accept()"))
