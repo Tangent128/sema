@@ -22,7 +22,22 @@ function script_mt:makeThread(func, name)
 		func = func
 	}, thread_mt)
 	
+	self:adoptThread(thread)
+	
 	return thread
+end
+
+-- move a thread to a different script's context for proper bookkeeping/killing
+function script_mt:adoptThread(thread)
+	
+	local oldScript = thread.script
+	if oldScript then
+		oldScript.threads[thread] = nil
+	end
+	
+	thread.script = self
+	self.threads[thread] = thread
+	
 end
 
 --[[
@@ -31,7 +46,8 @@ end
 
 function script.makeScript()
 	local context = setmetatable({
-		env = script.makeEnv()
+		env = script.makeEnv(),
+		threads = {},
 	}, script_mt)
 	return context
 end
@@ -43,5 +59,7 @@ env_mt.__index = api
 
 function script.makeEnv()
 	local env = setmetatable({}, env_mt)
+	env.command = {}
 	return env
 end
+

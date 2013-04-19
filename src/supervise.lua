@@ -1,6 +1,32 @@
 
 supervise = {}
 
+local scriptMap = {}
+
+local COMMAND_THREAD = {}
+local function grabScript(name)
+	--TODO: realpath
+	if scriptMap[name] then
+		return scriptMap[name]
+	end
+	
+	local newScript = script.makeScript()
+	
+	scriptMap[name] = newScript
+	
+	local dummyCount = 0
+	newScript.env.command.cmd = function()
+		local _ENV = newScript.env
+		dummyCount = dummyCount + 1
+		reply {
+			"OK",
+			"called "..name.." "..dummyCount.." times"
+		}
+	end
+	
+	return newScript
+end
+
 function supervise.main()
 	print "start server"
 	
@@ -28,21 +54,56 @@ function supervise.main()
 	queue.enqueue(test("A", 3))
 	queue.enqueue(test("B", 5))
 	--]]
-
+	
+	--[[
+	     Supervisor control protocol:
+	     ============================
+	     Client sends command message of form
+	     {scriptName, commandName, args...}
+	     
+	     (special status/debug/global commands use empty string
+	      for scriptName, else path to file)
+	      
+	     Server replies with message of one of following forms:
+	     {"OK", informationMessage}
+	     {"ERROR", explanationMessage}
+	--]]
 	local function connectionHandler(fd)
 			
-		local message = socket.receiveMessage(fd)
+		local activeThread = queue.getActive()
 		
-		for i=1,#message do
-			print("arg", #(message[i]), message[i])
+		local message = socket.receiveMessage(fd)
+		activeThread.reply = function(msg) socket.sendMessage(fd, msg) end
+		
+		if #message < 2 then
+			activeThread.reply {
+				"ERROR",
+				"Command message should at least feature \z
+				 a script path and command name"
+			}
+			return
 		end
-
-
-		message[#message + 1] = "added echo"
-	
-		supervisor.env.run{"sleep", 3}
-	
-		socket.sendMessage(fd, message)
+		
+		local scriptName = message[1]
+		local commandName = message[2]
+		
+		local activeScript = grabScript(scriptName)
+		
+		activeScript:adoptThread(activeThread)
+		
+		local command = activeScript.env.command and activeScript.env.command[commandName]
+		
+		if not command then
+			activeThread.reply {
+				"ERROR",
+				"Command handler "..commandName.." undefined for script "..scriptName.." .",
+				tostring(command)
+			}
+		end
+		
+		command( select(3, unpack(message)) )
+		
+		activeThread.reply {"OK", "Done."}
 		
 	end
 	
@@ -70,5 +131,6 @@ function supervise.main()
 	
 	print "done"	
 
+	aux.shutdown()
 end
 
