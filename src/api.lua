@@ -34,6 +34,20 @@ function api.reply(msg)
 	end
 end
 
+--[[
+     Default implementation for default commands
+--]]
+
+api.command = {}
+
+do 
+	local _ENV = api
+	function command.up()
+	end
+	function command.down()
+	end
+end
+
 -- TODO: cut DEBUG code
 api.print = print
 

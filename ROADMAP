@@ -1,16 +1,15 @@
 TODO:
 
-script command dispatch
-ls scripts
+script realpath (steal logic from getSocketPath for desired symlink behavior)
+check scripts exist on client
+load scripts on server
 killall for script
-get abs. file names
-load scripts from files
 unload files + killall
 
 ==== alpha?
 
 send signals to scripts
-send commands to scripts
+ls scripts
 
 ==== beta?
 
@@ -25,9 +24,10 @@ wait for given time
 ==== v1.0
 
 use?
-resolve file names to socket path (use common prefix & dots?)
+resolve file names to socket path (more realpathness + common prefix?)
 socket activation?
 inotify?
 metrics?
 log pipe?
+input pipe?
 

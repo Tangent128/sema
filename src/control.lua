@@ -1,7 +1,7 @@
 
 control = {}
 
-function control.main(...)
+function control.main(action, ...)
 	print "start client"
 	
 	local clientFd = socket.grabClientSocket()
@@ -11,22 +11,30 @@ function control.main(...)
 		aux.shutdown()
 	end
 	
-	local reader = script.makeScript()
-	queue.enqueue(reader:makeThread(function()
-		--socket.sendMessage(clientFd, {"dummy", "arg", "1234567890asdfghjkl1234567890poiuytrewq"})
-		math.randomseed(os.time())
-		local sel = math.random() * 2 + 1
-		local dummyScript = ({"dummy", "placeholder"})[math.floor(sel)]
-		print(sel,dummyScript)
-		socket.sendMessage(clientFd, {dummyScript, "cmd"})
+	local client = script.makeScript()
+	local actionFunc
+	
+	if action == "command" then
+		error "commands not implemented yet"
+	elseif action == "debug" then
+		actionFunc = function()
+			--socket.sendMessage(clientFd, {"dummy", "arg", })
+			math.randomseed(os.time())
+			local sel = math.random() * 2 + 1
+			local dummyScript = ({"dummy", "placeholder"})[math.floor(sel)]
+			print(sel,dummyScript)
+			socket.sendMessage(clientFd, {dummyScript, "cmd", "1234567890asdfghjkl1234567890poiuytrewq"})
 
-		local message = socket.receiveMessage(clientFd)
+			local message = socket.receiveMessage(clientFd)
 
-		for i=1,#message do
-			print("arg", #(message[i]), message[i])
+			for i=1,#message do
+				print("arg", #(message[i]), message[i])
+			end
+
 		end
-
-	end, "read()"))
+	end
+	
+	queue.enqueue(client:makeThread(actionFunc, action))
 
 	queue.eventLoopMain()
 	

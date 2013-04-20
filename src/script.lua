@@ -55,11 +55,14 @@ end
 -- script _ENV metatable
 -- needs to be seperate from index table (defined in api.lua) to prevent accessing it via __index
 local env_mt = {}
-env_mt.__index = api
+env_mt.__index = api -- see api.lua
+
+local command_mt = {}
+command_mt.__index = api.command -- see api.lua
 
 function script.makeEnv()
 	local env = setmetatable({}, env_mt)
-	env.command = {}
+	env.command = setmetatable({}, command_mt)
 	return env
 end
 
