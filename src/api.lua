@@ -46,6 +46,12 @@ do
 	end
 	function command.down()
 	end
+	function command.status()
+		reply {
+			"OK",
+			"Script loaded."
+		}
+	end
 end
 
 -- TODO: cut DEBUG code

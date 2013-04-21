@@ -4,6 +4,7 @@ control = {}
 function control.main(action, ...)
 	print "start client"
 	
+	-- connect to server
 	local clientFd = socket.grabClientSocket()
 	
 	if not clientFd then
@@ -11,11 +12,49 @@ function control.main(action, ...)
 		aux.shutdown()
 	end
 	
+	-- prepare thread to issue command
 	local client = script.makeScript()
+	local args = {...}
 	local actionFunc
 	
+	-- utility functions
+	local function printReply()
+		local message = socket.receiveMessage(clientFd)
+	
+		--TODO: friendlier printing
+		for i=1,#message do
+			print("arg", #(message[i]), message[i])
+		end
+	end
+	
+	local function checkScript(file)
+		
+		local path = aux.absPath(file)
+		
+		-- ensure file exists
+		local handle, err = io.open(path)
+
+		if handle then
+			io.close(handle)
+		else
+			error(err)
+		end
+		
+		return path
+	end
+
+	-- select command
 	if action == "command" then
-		error "commands not implemented yet"
+		actionFunc = function()
+			
+			args[1] = checkScript(args[1])
+			args[2] = args[2] or "status"
+			
+			socket.sendMessage(clientFd, args)
+			
+			printReply()
+			
+		end
 	elseif action == "debug" then
 		actionFunc = function()
 			--socket.sendMessage(clientFd, {"dummy", "arg", })
@@ -34,6 +73,7 @@ function control.main(action, ...)
 		end
 	end
 	
+	-- execute
 	queue.enqueue(client:makeThread(actionFunc, action))
 
 	queue.eventLoopMain()

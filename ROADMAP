@@ -10,6 +10,7 @@ unload files + killall
 
 send signals to scripts
 ls scripts
+usage help
 
 ==== beta?
 

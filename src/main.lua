@@ -22,7 +22,7 @@ if args[1] and args[1]:match "^[-][-]" then
 	
 	if args[1] == "--server" then
 		mode = "server"
-	elseif args[1] == "--client" then
+	elseif args[1] == "--client" and #args >= 2 then
 		mode = "client"
 		action = "command"
 	elseif args[1] == "--debug" then
@@ -32,7 +32,7 @@ if args[1] and args[1]:match "^[-][-]" then
 		mode = "help"
 	end
 	
-elseif #args == 0 then
+elseif #args < 1 then
 	mode = "help"
 end
 

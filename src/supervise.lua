@@ -79,6 +79,7 @@ function supervise.main()
 				"Command handler "..commandName.." undefined for script "..scriptName.." .",
 				tostring(command)
 			}
+			return
 		end
 		
 		command( select(3, unpack(message)) )
