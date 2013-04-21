@@ -12,22 +12,6 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-static int absPath(lua_State *L) {
-// TODO: move to osaux module at some point, has non-socket uses
-	const char *relative = luaL_checkstring(L, 1);
-	
-	char *absolute = realpath(relative, NULL);
-	
-	if(absolute == NULL) {
-		lua_pushstring(L, relative);
-	} else {
-		lua_pushstring(L, absolute);
-	}
-	free(absolute);
-	
-	return 1;
-}
-
 static int grabServerSocket(lua_State *L) {
 	const char *path = luaL_checkstring(L, 1);
 	
@@ -173,7 +157,6 @@ static int formatNetworkInt(lua_State *L) {
 
 static const luaL_Reg socketFuncs[] = {
 	/* wrapped in, or only used by, socket.lua */
-	{ "cAbsPath", &absPath},
 	{ "cGrabServerSocket", &grabServerSocket },
 	{ "cGrabClientSocket", &grabClientSocket },
 	{ "cAccept", &acceptConnection },

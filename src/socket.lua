@@ -10,19 +10,8 @@ function socket.getSocketPath()
 	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")
 	socketPath = os.getenv("SEMA_SOCKET") or "./sema.socket"
 	
-	local dir, name = socketPath:match("^(.-/?)([^/]-)$")
-	
-	if #dir == 0 then
-		--TODO: may want to use some default directory
-		-- in these cases besides cwd?
-		dir = "./"
-	end
-		
-	-- normalize directory, including a trailing slash
-	-- (but leave "/" as-is, not "//")
-	dir = socket.cAbsPath(dir):gsub("^(.-)/?$", "%1/")
-	
-	socketPath = dir .. name
+	socketPath = aux.absPath(socketPath)
+
 	return socketPath
 end
 
