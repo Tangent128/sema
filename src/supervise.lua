@@ -5,16 +5,37 @@ local scriptMap = {}
 
 local COMMAND_THREAD = {}
 local function grabScript(name)
-	--TODO: realpath
+
 	if scriptMap[name] then
 		return scriptMap[name]
 	end
 	
 	local newScript = script.makeScript()
-	
 	scriptMap[name] = newScript
 	
-	local dummyCount = 0
+	local func, err = loadfile(name, "bt", newScript.env)
+	
+	local mainThread
+	if func then
+		mainThread = newScript:makeThread(function()
+			local ok, err = pcall(func)
+			print("main done "..name)
+			
+			--TODO: killall threads in script
+			scriptMap[name] = nil
+			
+			if not ok then error(err) end
+		end, name)
+	else
+		error(err)
+	end
+	
+	-- main thread determines script ready status
+	newScript.main = mainThread
+	
+	queue.enqueue(mainThread)
+	
+	--[[local dummyCount = 0
 	newScript.env.command.cmd = function()
 		local _ENV = newScript.env
 		dummyCount = dummyCount + 1
@@ -23,6 +44,7 @@ local function grabScript(name)
 			"called "..name.." "..dummyCount.." times"
 		}
 	end
+	--]]
 	
 	return newScript
 end
@@ -81,6 +103,8 @@ function supervise.main()
 			}
 			return
 		end
+		
+		--TODO: wait on script running
 		
 		command( select(3, unpack(message)) )
 		

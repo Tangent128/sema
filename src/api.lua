@@ -42,10 +42,13 @@ api.command = {}
 
 do 
 	local _ENV = api
+	
 	function command.up()
 	end
+	
 	function command.down()
 	end
+	
 	function command.status()
 		reply {
 			"OK",
@@ -54,7 +57,8 @@ do
 	end
 end
 
--- TODO: cut DEBUG code
-api.print = print
+-- access to global environment for debug purposes
+-- (not realistic security risk, as scripts can inherently spawn arbitrary processes)
+api.DEBUG = _G
 
 

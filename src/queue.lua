@@ -47,6 +47,9 @@ end
 local function kill(thread)
 	activeSet[thread] = nil
 	liveSet[thread] = nil
+	if thread.script then
+		thread.script.threads[thread] = nil
+	end
 end
 
 function queue.enqueue(thread)
@@ -85,6 +88,13 @@ end
 function queue.getActive()
 	return activeThread
 end
+
+--TODO: generic wait queue w/ waitOn(event) & resume-with-callback methods?
+--[[
+     Threads blocked on another thread being "ready"
+--]]
+
+
 
 --[[
      Threads blocked on child processes

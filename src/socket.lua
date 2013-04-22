@@ -86,7 +86,7 @@ function socket.sendMessage(fd, message)
 	--format message body
 	local body = ""
 	for i=1,#message do
-		local arg = message[i]
+		local arg = tostring(message[i])
 		body = body .. socket.formatNetworkInt(#arg) .. arg
 	end
 	

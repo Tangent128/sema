@@ -1,20 +1,20 @@
 TODO:
 
-script realpath (steal logic from getSocketPath for desired symlink behavior)
-check scripts exist on client
-load scripts on server
+wait on script ready to run commands
+figure out why extra replies not erroring
 killall for script
+killall ends processes
 unload files + killall
 
 ==== alpha?
 
-send signals to scripts
+send signals to scripts/threads
 ls scripts
+down mode
 usage help
 
 ==== beta?
 
-down mode
 check TODOs
 double check for error conditions/memory leaks/fd leaks
 
