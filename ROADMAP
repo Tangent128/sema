@@ -1,7 +1,7 @@
 TODO:
 
 wait on script ready to run commands
-figure out why extra replies not erroring
+figure out why extra replies not erroring (writes before client closes? try sleep to trigger problem)
 killall for script
 killall ends processes
 unload files + killall
@@ -16,6 +16,7 @@ usage help
 ==== beta?
 
 check TODOs
+update Lua source
 double check for error conditions/memory leaks/fd leaks
 
 ==== v0.9
