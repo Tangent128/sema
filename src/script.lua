@@ -19,7 +19,8 @@ function script_mt:makeThread(func, name)
 	local thread = setmetatable({
 		script = self,
 		name = name,
-		func = func
+		func = func,
+		ready = nil
 	}, thread_mt)
 	
 	self:adoptThread(thread)

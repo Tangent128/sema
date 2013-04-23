@@ -41,9 +41,16 @@ local activeSet = {}
 local function activate(thread)
 	activeSet[thread] = thread
 end
+
 local function deactivate(thread)
 	activeSet[thread] = nil
+
+	if thread.ready ~= false then
+		thread.ready = true
+		queue.resumeWaitersOnThread(thread)
+	end
 end
+
 local function kill(thread)
 	activeSet[thread] = nil
 	liveSet[thread] = nil
@@ -94,6 +101,28 @@ end
      Threads blocked on another thread being "ready"
 --]]
 
+local threadBlocked = {}
+
+function queue.waitOnThread(waitee)
+	if waitee.ready == true then
+		return -- no need to wait
+	end
+
+	--activeThread declared above
+	threadBlocked[waitee] = threadBlocked[waitee] or {}
+	threadBlocked[waitee][activeThread] = activeThread
+	deactivate(activeThread)
+	coroutine.yield()
+end
+
+function queue.resumeWaitersOnThread(waitee)
+	if threadBlocked[waitee] then
+		for thread in pairs(threadBlocked[waitee]) do
+			activate(thread)
+		end
+		threadBlocked[waitee] = nil
+	end
+end
 
 
 --[[
@@ -119,6 +148,7 @@ function queue.resumePid(pid, status)
 		activate(thread)
 	end
 end
+
 
 --[[
      Threads blocked on file descriptor reads

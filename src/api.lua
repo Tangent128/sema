@@ -14,10 +14,12 @@ end
 
 -- spawn a child process and wait for exit
 function api.run(tbl, ...)
+	-- normalize arguments
 	if type(tbl) ~= "table" then
 		return api.run{tbl, ...}
 	end
 	
+	-- run child process
 	local pid = children.run(table.unpack(tbl))
 	queue.waitPid(pid)
 	return current().pidExitStatus

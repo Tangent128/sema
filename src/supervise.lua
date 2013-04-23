@@ -35,17 +35,6 @@ local function grabScript(name)
 	
 	queue.enqueue(mainThread)
 	
-	--[[local dummyCount = 0
-	newScript.env.command.cmd = function()
-		local _ENV = newScript.env
-		dummyCount = dummyCount + 1
-		reply {
-			"OK",
-			"called "..name.." "..dummyCount.." times"
-		}
-	end
-	--]]
-	
 	return newScript
 end
 
@@ -93,6 +82,10 @@ function supervise.main()
 		
 		activeScript:adoptThread(activeThread)
 		
+		-- wait on script running
+		queue.waitOnThread(activeScript.main)
+
+		-- look up command
 		local command = activeScript.env.command and activeScript.env.command[commandName]
 		
 		if not command then
@@ -103,8 +96,6 @@ function supervise.main()
 			}
 			return
 		end
-		
-		--TODO: wait on script running
 		
 		command( select(3, unpack(message)) )
 		
