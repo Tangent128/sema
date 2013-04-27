@@ -62,7 +62,8 @@ local command_mt = {}
 command_mt.__index = api.command -- see api.lua
 
 function script.makeEnv()
-	local env = setmetatable({}, env_mt)
+	local env = setmetatable({
+	}, env_mt)
 	env.command = setmetatable({}, command_mt)
 	return env
 end

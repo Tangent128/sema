@@ -46,9 +46,12 @@ do
 	local _ENV = api
 	
 	function command.up()
+		--up()
 	end
 	
 	function command.down()
+		--down()
+		--killall()
 	end
 	
 	function command.status()

@@ -164,7 +164,15 @@ function socket.receiveMessage(fd)
 	return message
 end
 
+-- prevent client from deleting a socket it created when spawning a server
+function socket.detachServer()
+	if serverFd then
+		socket.close(serverFd)
+		serverFd = nil
+	end
+end
 
+-- on exit, clean up socket
 function socket.serverShutdown()
 	if serverFd then
 		socket.cUnlink(socket.getSocketPath())

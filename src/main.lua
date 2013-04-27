@@ -53,13 +53,14 @@ if mode == "spawn" then
 	else
 		-- get server socket ready
 		socket.grabServerSocket()
-		mode = init.modeFork()
+		mode = aux.modeFork()
 	end
 end
 
 -- start appropriate code path
 
 if mode == "client" then
+	socket.detachServer()
 	control.main(action, select(argStartIndex, unpack(args)))
 elseif mode == "server" then
 	supervise.main()

@@ -1,5 +1,6 @@
 TODO:
 
+down mode
 killall for script
 killall ends processes
 unload files + killall
@@ -8,7 +9,7 @@ unload files + killall
 
 send signals to scripts/threads
 ls scripts
-down mode
+down mode works when launching command is "down"
 usage help
 
 ==== beta?

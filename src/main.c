@@ -42,7 +42,6 @@ int main(int argc, char** argv) {
 	luaL_openlibs(L);
 	
 	// load C functions
-	OPEN_LUA_C_LIB(L, init)
 	OPEN_LUA_C_LIB(L, aux)
 	OPEN_LUA_C_LIB(L, signal)
 	OPEN_LUA_C_LIB(L, children)

@@ -83,7 +83,7 @@ function control.main(action, ...)
 	queue.enqueue(client:makeThread(actionFunc, action))
 
 	queue.eventLoopMain()
-	
+
 	aux.shutdown()
 end
 
