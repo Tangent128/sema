@@ -1,7 +1,5 @@
 TODO:
 
-wait on script ready to run commands
-figure out why extra replies not erroring (writes before client closes? try sleep to trigger problem)
 killall for script
 killall ends processes
 unload files + killall

@@ -56,15 +56,20 @@ function supervise.main()
 	      for scriptName, else path to file)
 	      
 	     Server replies with message of one of following forms:
-	     {"OK", informationMessage}
-	     {"ERROR", explanationMessage}
+	     {"STATUS", informationMessage}
+	     {"OK", informationMessage} (ends connection)
+	     {"ERROR", explanationMessage} (ends connection)
 	--]]
 	local function connectionHandler(fd)
 			
 		local activeThread = queue.getActive()
 		
 		local message = socket.receiveMessage(fd)
-		activeThread.reply = function(msg) socket.sendMessage(fd, msg) end
+		activeThread.reply = function(msg)
+			pcall(socket.sendMessage, fd, msg)
+			
+			--TODO: report error, even if writing to broken socket harmless?
+		end
 		
 		if #message < 2 then
 			activeThread.reply {
@@ -82,7 +87,7 @@ function supervise.main()
 		
 		activeScript:adoptThread(activeThread)
 		
-		-- wait on script running
+		-- wait on script having run long enough to define commands
 		queue.waitOnThread(activeScript.main)
 
 		-- look up command

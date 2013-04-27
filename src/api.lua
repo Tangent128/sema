@@ -27,10 +27,10 @@ end
 
 -- send a message back to the client that spawned this command
 -- (only works from a command handler)
-function api.reply(msg)
+function api.reply(...)
 	local reply = current().reply
 	if reply then
-		reply(msg)
+		reply{"STATUS", ...}
 	else
 		error("reply() has to be called from a command handler")
 	end

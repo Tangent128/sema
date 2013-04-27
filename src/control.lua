@@ -18,13 +18,19 @@ function control.main(action, ...)
 	local actionFunc
 	
 	-- utility functions
-	local function printReply()
+	local function printReplies()
 		local message = socket.receiveMessage(clientFd)
 	
 		--TODO: friendlier printing
 		for i=1,#message do
 			print("arg", #(message[i]), message[i])
 		end
+		
+		if message[1] == "OK" or message[1] == "ERROR" then
+			return
+		end
+		
+		return printReplies()
 	end
 	
 	local function checkScript(file)
@@ -52,7 +58,7 @@ function control.main(action, ...)
 			
 			socket.sendMessage(clientFd, args)
 			
-			printReply()
+			printReplies()
 			
 		end
 	elseif action == "debug" then

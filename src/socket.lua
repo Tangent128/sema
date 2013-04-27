@@ -26,6 +26,7 @@ function socket.grabClientSocket()
 
 	if clientFd then
 		poll.addFd(clientFd, "read")
+		socket.buffers[clientFd] = ""
 	end
 
 	return clientFd
@@ -42,24 +43,33 @@ function socket.grabServerSocket()
 
 	if serverFd then
 		poll.addFd(serverFd, "read")
+		socket.buffers[serverFd] = ""
 		aux.addExitHook(socket.serverShutdown)
 	end
 
 	return serverFd
 end
 
+--incompletely-received data
+socket.buffers = {}
+
 --to only be run from a blockable coroutine!
 function socket.accept(serverFd)
 	queue.waitFd(serverFd)
 	
+	-- get connection fd
 	local clientFd = socket.cAccept(serverFd)
+	
+	-- prepare to receive data from it
 	poll.addFd(clientFd, "read")
+	socket.buffers[clientFd] = ""
 	
 	return clientFd
 end
 
 function socket.close(fd)
 	poll.dropFd(fd)
+	socket.buffers[fd] = nil
 	socket.cClose(fd)
 end
 
@@ -101,53 +111,54 @@ local function readBlock(fd)
 	local block = socket.cRead(fd)
 	
 	if #block == 0 then
-		error "Connection closed before whole message sent."
+		error "Connection closed before whole message received."
 	end
 	
 	return block
 end
 
 --to only be run from a blockable coroutine!
---assumption: only one message is sent each way on a connection
+--assumption: only one coroutine is reading at a time
 --- (later fix: "buffer" -> "buffers[fd]" w/ bookkeeping in accept/close?
 ---  & then extract appropriate chunks)
 function socket.receiveMessage(fd)
-	local readBytes = 0
-	local buffer = ""
+	local buffers = socket.buffers
+	local readBytes = #buffers[fd]
 	
 	--read message header
 	while readBytes < 9 do
 		local block = readBlock(fd)
-		buffer = buffer .. block
+		buffers[fd] = buffers[fd] .. block
 		readBytes = readBytes + #block
 	end
 	
-	if buffer:sub(1,5) ~= "sema\x00" then
+	if buffers[fd]:sub(1,5) ~= "sema\x00" then
 		error "Message was not a sema packet."
 	end
 	
-	local messageLength = socket.readNetworkInt(buffer:sub(6,9))
+	local messageLength = socket.readNetworkInt(buffers[fd]:sub(6,9))
 	
 	--discard header and read message body
-	buffer = buffer:sub(10)
-	readBytes = #buffer
+	buffers[fd] = buffers[fd]:sub(10)
+	readBytes = #buffers[fd]
 	
 	while readBytes < messageLength do
 		local block = readBlock(fd)
-		buffer = buffer .. block
+		buffers[fd] = buffers[fd] .. block
 		readBytes = readBytes + #block
 	end
 	
-	--security/sanity
-	buffer = buffer:sub(1,messageLength)
+	--split out the current message while keeping any spare data in the buffer
+	local messageBytes = buffers[fd]:sub(1,messageLength)
+	buffers[fd] = buffers[fd]:sub(messageLength + 1)
 	
 	--parse message body
 	local message = {}
 	
-	while #buffer >= 4 do
-		local argLength = socket.readNetworkInt(buffer:sub(1,4))
-		message[#message + 1] = buffer:sub(5, 4 + argLength)
-		buffer = buffer:sub(5 + argLength)
+	while #messageBytes >= 4 do
+		local argLength = socket.readNetworkInt(messageBytes:sub(1,4))
+		message[#message + 1] = messageBytes:sub(5, 4 + argLength)
+		messageBytes = messageBytes:sub(5 + argLength)
 	end
 	
 	return message
