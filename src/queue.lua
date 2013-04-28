@@ -32,10 +32,13 @@ function queue.eventLoopMain()
 end
 
 --[[
-     Threads that can run
+     Queue management
 --]]
 
+-- Threads that exist
 local liveSet = {}
+
+--Threads that can run
 local activeSet = {}
 
 local function activate(thread)
@@ -47,7 +50,9 @@ local function deactivate(thread)
 
 	if thread.ready ~= false then
 		thread.ready = true
-		queue.resumeWaitersOnThread(thread)
+		queue.threadBlocked:resumeOnAndClear(thread)
+	else
+		-- unclear thread
 	end
 end
 
@@ -96,33 +101,62 @@ function queue.getActive()
 	return activeThread
 end
 
---TODO: generic wait queue w/ waitOn(event) & resume-with-callback methods?
 --[[
-     Threads blocked on another thread being "ready"
+     Generic container for threads waiting on some event to resume.
+     A waitSet identifies relevant events by some key, scheduling
+     all threads waiting on a given key when notified.
+     A "cleared" event stays triggered, and waits on it return immediately.
 --]]
 
-local threadBlocked = {}
+local wait_mt = {}
+wait_mt.__index = wait_mt
 
-function queue.waitOnThread(waitee)
-	if waitee.ready == true then
+function wait_mt:waitOn(key)
+	if self.clear[key] then
 		return -- no need to wait
 	end
+	
+	local blocked = self.blocked
+	blocked[key] = blocked[key] or {}
 
 	--activeThread declared above
-	threadBlocked[waitee] = threadBlocked[waitee] or {}
-	threadBlocked[waitee][activeThread] = activeThread
+	blocked[key][activeThread] = activeThread
 	deactivate(activeThread)
 	coroutine.yield()
 end
 
-function queue.resumeWaitersOnThread(waitee)
-	if threadBlocked[waitee] then
-		for thread in pairs(threadBlocked[waitee]) do
+function wait_mt:resumeOn(key, ...)
+	local blockedThreads = self.blocked[key]
+	if blockedThreads then
+		for thread in pairs(blockedThreads) do
+			if self.resumeFunc then self.resumeFunc(thread, key, ...) end
 			activate(thread)
 		end
-		threadBlocked[waitee] = nil
+		self.blocked[key] = nil
 	end
 end
+
+function wait_mt:resumeOnAndClear(key, ...)
+	self.clear[key] = true
+	self:resumeOn(key, ...)
+end
+
+-- resume func is called as resumeFunc(thread, key, ...),
+-- getting any extra arguments passed to waitSet:resume()
+function queue.newWaitSet(resumeFunc)
+	return setmetatable({
+		blocked = {},
+		clear = {},
+		resumeFunc = resumeFunc,
+	}, wait_mt)
+end
+
+--[[
+     Predefined queues
+--]]
+
+-- Threads blocked on another thread being "ready"
+queue.threadBlocked = queue.newWaitSet()
 
 
 --[[

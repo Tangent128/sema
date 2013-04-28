@@ -88,7 +88,7 @@ function supervise.main()
 		activeScript:adoptThread(activeThread)
 		
 		-- wait on script having run long enough to define commands
-		queue.waitOnThread(activeScript.main)
+		queue.threadBlocked:waitOn(activeScript.main)
 
 		-- look up command
 		local command = activeScript.env.command and activeScript.env.command[commandName]
