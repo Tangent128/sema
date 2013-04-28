@@ -21,7 +21,7 @@ function api.run(tbl, ...)
 	
 	-- run child process
 	local pid = children.run(table.unpack(tbl))
-	queue.waitPid(pid)
+	queue.pidBlocked:waitOn(pid)
 	return current().pidExitStatus
 end
 

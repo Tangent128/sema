@@ -18,12 +18,12 @@ function queue.eventLoopMain()
 	
 		-- resume threads waiting on child processes to finish
 		for pid, status in pairs(events.children) do
-			queue.resumePid(pid, status)
+			queue.pidBlocked:resumeOn(pid, status)
 		end
 		
 		-- resume threads waiting on an fd to be safely readable
 		for fd in pairs(events.fds) do
-			queue.resumeFd(fd)
+			queue.fdBlocked:resumeOn(fd)
 		end
 		
 		queue.runActive()
@@ -158,52 +158,12 @@ end
 -- Threads blocked on another thread being "ready"
 queue.threadBlocked = queue.newWaitSet()
 
+-- Threads blocked on child processes
+queue.pidBlocked = queue.newWaitSet(function(thread, pid, status)
+	thread.pidExitStatus = status
+end)
 
---[[
-     Threads blocked on child processes
---]]
+-- Threads blocked on file descriptor reads
+queue.fdBlocked = queue.newWaitSet()
 
-local pidBlocked = {}
-
--- assumption: only one thread can wait on a given PID
-function queue.waitPid(pid)
-	--activeThread declared above
-	pidBlocked[pid] = activeThread
-	deactivate(activeThread)
-	coroutine.yield()
-end
-
--- assumption: a thread only waits on one PID at a time
-function queue.resumePid(pid, status)
-	local thread = pidBlocked[pid]
-	if thread then
-		pidBlocked[pid] = nil
-		thread.pidExitStatus = status
-		activate(thread)
-	end
-end
-
-
---[[
-     Threads blocked on file descriptor reads
---]]
-
-local fdBlocked = {}
-
--- assumption: only one thread can wait on a given fd
-function queue.waitFd(fd)
-	--activeThread declared above
-	fdBlocked[fd] = activeThread
-	deactivate(activeThread)
-	coroutine.yield()
-end
-
--- assumption: a thread only waits on one fd at a time
-function queue.resumeFd(fd)
-	local thread = fdBlocked[fd]
-	if thread then
-		fdBlocked[fd] = nil
-		activate(thread)
-	end
-end
 

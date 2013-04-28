@@ -55,7 +55,7 @@ socket.buffers = {}
 
 --to only be run from a blockable coroutine!
 function socket.accept(serverFd)
-	queue.waitFd(serverFd)
+	queue.fdBlocked:waitOn(serverFd)
 	
 	-- get connection fd
 	local clientFd = socket.cAccept(serverFd)
@@ -106,7 +106,7 @@ function socket.sendMessage(fd, message)
 end
 
 local function readBlock(fd)
-	queue.waitFd(fd)
+	queue.fdBlocked:waitOn(fd)
 	
 	local block = socket.cRead(fd)
 	
