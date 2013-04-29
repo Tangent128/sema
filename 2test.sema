@@ -1,0 +1,31 @@
+#!./sema
+
+local running = true
+
+local c = 0
+
+function command.incr(...)
+	c = c + 1
+	reply(c, ...)
+	local status = run{"sleep", 1}
+	reply(status)
+end
+
+function command.quit()
+	running = false
+end
+
+--DEBUG.print(threadName())
+
+while running do
+
+run{
+	"sleep", "3"
+}
+
+DEBUG.print "looop!"
+
+end
+
+--DEBUG.print "done!"
+

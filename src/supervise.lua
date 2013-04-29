@@ -4,7 +4,7 @@ supervise = {}
 local scriptMap = {}
 
 local COMMAND_THREAD = {}
-local function grabScript(name)
+local function grabScript(name, startDown)
 
 	if scriptMap[name] then
 		return scriptMap[name]
@@ -18,7 +18,15 @@ local function grabScript(name)
 	local mainThread
 	if func then
 		mainThread = newScript:makeThread(function()
+			
+			-- insure service is up
+			if not startDown then
+				api.setEvent("up")
+			end
+		
+			-- run script chunk
 			local ok, err = pcall(func)
+			-- TODO: remove debug print once script ls is a thing
 			print("main done "..name)
 			
 			--TODO: killall threads in script
@@ -83,7 +91,7 @@ function supervise.main()
 		local scriptName = message[1]
 		local commandName = message[2]
 		
-		local activeScript = grabScript(scriptName)
+		local activeScript = grabScript(scriptName, commandName == "down")
 		
 		activeScript:adoptThread(activeThread)
 		

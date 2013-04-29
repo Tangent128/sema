@@ -141,6 +141,10 @@ function wait_mt:resumeOnAndClear(key, ...)
 	self:resumeOn(key, ...)
 end
 
+function wait_mt:unClear(key)
+	self.clear[key] = nil
+end
+
 -- resume func is called as resumeFunc(thread, key, ...),
 -- getting any extra arguments passed to waitSet:resume()
 function queue.newWaitSet(resumeFunc)
@@ -155,7 +159,7 @@ end
      Predefined queues
 --]]
 
--- Threads blocked on another thread being "ready"
+-- Threads blocked on another thread having had runtime
 queue.threadBlocked = queue.newWaitSet()
 
 -- Threads blocked on child processes

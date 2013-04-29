@@ -48,6 +48,7 @@ end
 function script.makeScript()
 	local context = setmetatable({
 		env = script.makeEnv(),
+		events = queue.newWaitSet(),
 		threads = {},
 	}, script_mt)
 	return context

@@ -1,21 +1,21 @@
 TODO:
 
-down mode
+send signals to scripts/threads
+default down() SIGTERMs child
 killall for script
 killall ends processes
 unload files + killall
 
 ==== alpha?
 
-send signals to scripts/threads
 ls scripts
-down mode works when launching command is "down"
 usage help
 
 ==== beta?
 
 check TODOs
 update Lua source
+test multiple copies of scripts (& different scripts) non-interfering
 double check for error conditions/memory leaks/fd leaks
 
 ==== v0.9

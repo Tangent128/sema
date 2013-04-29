@@ -19,6 +19,9 @@ function api.run(tbl, ...)
 		return api.run{tbl, ...}
 	end
 	
+	-- insure we are not down
+	api.waitEvent "up"
+	
 	-- run child process
 	local pid = children.run(table.unpack(tbl))
 	queue.pidBlocked:waitOn(pid)
@@ -37,6 +40,28 @@ function api.reply(...)
 end
 
 --[[
+     Event functions
+--]]
+
+function api.waitEvent(name)
+	current().script.events:waitOn(name)
+end
+
+function api.triggerEvent(name)
+	current().script.events:resumeOn(name)
+end
+
+function api.setEvent(name, on)
+	if on == nil then on = true end
+	
+	if on then
+		current().script.events:resumeOnAndClear(name)
+	else
+		current().script.events:unClear(name)
+	end
+end
+
+--[[
      Default implementation for default commands
 --]]
 
@@ -46,11 +71,11 @@ do
 	local _ENV = api
 	
 	function command.up()
-		--up()
+		setEvent("up")
 	end
 	
 	function command.down()
-		--down()
+		setEvent("up", false)
 		--killall()
 	end
 	
