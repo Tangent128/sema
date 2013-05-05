@@ -1,6 +1,6 @@
 TODO:
 
-send signals to scripts/threads
+send signals to threads
 default down() SIGTERMs child
 killall for script
 killall ends processes

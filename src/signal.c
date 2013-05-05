@@ -42,9 +42,20 @@ static int readSignal(lua_State *L) {
 	return 1;
 }
 
+static int sendSignal(lua_State *L) {
+	int pid = luaL_checkint(L, 1);
+	int signum = luaL_checkint(L, 2);
+	
+	kill(pid, signum);
+	printf("sent signal %d to %d\n", signum, pid);
+	
+	return 0;
+}
+
 static const luaL_Reg signalFuncs[] = {
 	{ "makeSignalFd", &makeSignalFd },
 	{ "readSignal", &readSignal },
+	{ "sendSignal", &sendSignal },
 	{ NULL, NULL }
 };
 
@@ -59,9 +70,12 @@ int luaopen_signal(lua_State *L) {
 	REGISTER_SIGNAL(SIGALRM);
 	REGISTER_SIGNAL(SIGCHLD);
 	REGISTER_SIGNAL(SIGHUP);
-	REGISTER_SIGNAL(SIGTERM);
 	REGISTER_SIGNAL(SIGINT);
+	REGISTER_SIGNAL(SIGKILL);
 	REGISTER_SIGNAL(SIGPIPE);
+	REGISTER_SIGNAL(SIGTERM);
+	REGISTER_SIGNAL(SIGUSR1);
+	REGISTER_SIGNAL(SIGUSR2);
 	// TODO: more
 	
 	return 1;

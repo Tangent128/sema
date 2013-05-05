@@ -1,6 +1,12 @@
 
 script = {}
 
+local threadId = 0
+local function nextId()
+	threadId = threadId + 1
+	return threadId
+end
+
 --[[
      thread metatable
 --]]
@@ -15,12 +21,14 @@ thread_mt.__index = thread_mt
 local script_mt = {}
 script_mt.__index = script_mt
 
-function script_mt:makeThread(func, name)
+function script_mt:makeThread(func)
 	local thread = setmetatable({
 		script = self,
-		name = name,
 		func = func,
-		ready = nil
+		id = nextId(),
+		ready = nil,
+		waitSet = nil,
+		waitKey = nil,
 	}, thread_mt)
 	
 	self:adoptThread(thread)
@@ -33,11 +41,11 @@ function script_mt:adoptThread(thread)
 	
 	local oldScript = thread.script
 	if oldScript then
-		oldScript.threads[thread] = nil
+		oldScript.threads[thread.id] = nil
 	end
 	
 	thread.script = self
-	self.threads[thread] = thread
+	self.threads[thread.id] = thread
 	
 end
 
@@ -45,11 +53,13 @@ end
      supervisor-side API
 --]]
 
-function script.makeScript()
+function script.makeScript(name)
 	local context = setmetatable({
 		env = script.makeEnv(),
 		events = queue.newWaitSet(),
+		name = name,
 		threads = {},
+		main = nil, --set in supervise.lua, grabScript()
 	}, script_mt)
 	return context
 end

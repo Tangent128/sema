@@ -60,7 +60,7 @@ local function kill(thread)
 	activeSet[thread] = nil
 	liveSet[thread] = nil
 	if thread.script then
-		thread.script.threads[thread] = nil
+		thread.script.threads[thread.id] = nil
 	end
 end
 
@@ -121,6 +121,8 @@ function wait_mt:waitOn(key)
 
 	--activeThread declared above
 	blocked[key][activeThread] = activeThread
+	activeThread.waitSet = self
+	activeThread.waitKey = key
 	deactivate(activeThread)
 	coroutine.yield()
 end
@@ -130,6 +132,8 @@ function wait_mt:resumeOn(key, ...)
 	if blockedThreads then
 		for thread in pairs(blockedThreads) do
 			if self.resumeFunc then self.resumeFunc(thread, key, ...) end
+			thread.waitSet = nil
+			thread.waitKey = nil
 			activate(thread)
 		end
 		self.blocked[key] = nil

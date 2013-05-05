@@ -11,16 +11,32 @@ function command.incr(...)
 	reply(status)
 end
 
+function command.lsenv()
+	for name in DEBUG.pairs(DEBUG.api) do
+		reply(name)
+	end
+	reply "====="
+	for name in DEBUG.pairs(_ENV) do
+		reply(name)
+	end
+end
+
 function command.quit()
 	running = false
+end
+
+function command.down()
+	setEvent("up", false)
+	-- sleep doesn't die easily...
+	signal(nil, DEBUG.signal.SIGKILL)
 end
 
 --DEBUG.print(threadName())
 
 while running do
 
-run{
-	"sleep", "3"
+runIfUp{
+	"sleep", "300"
 }
 
 DEBUG.print "looop!"
