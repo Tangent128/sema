@@ -28,7 +28,7 @@ end
 function command.down()
 	setEvent("up", false)
 	-- sleep doesn't die easily...
-	signal(nil, DEBUG.signal.SIGKILL)
+	signal(nil, SIGKILL)
 end
 
 --DEBUG.print(threadName())

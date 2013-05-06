@@ -1,7 +1,6 @@
 TODO:
 
 send signals to threads
-default down() SIGTERMs child
 killall for script
 killall ends processes
 unload files + killall
@@ -14,7 +13,8 @@ usage help
 ==== beta?
 
 check TODOs
-update Lua source
+evade DEBUG usage where possible
+update Lua source version
 test multiple copies of scripts (& different scripts) non-interfering
 double check for error conditions/memory leaks/fd leaks
 

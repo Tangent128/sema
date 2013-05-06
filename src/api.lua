@@ -79,6 +79,13 @@ function api.signal(threadID, signum)
 	end
 end
 
+-- splice in signal constants
+for name, num in pairs(signal) do
+	if type(name) == "string" and name:sub(1,3) == "SIG" then
+		api[name] = num
+	end
+end
+
 --[[
      Event functions
 --]]
@@ -116,7 +123,7 @@ do
 	
 	function command.down()
 		setEvent("up", false)
-		signal(nil, DEBUG.signal.SIGTERM)
+		signal(nil, SIGTERM)
 	end
 	
 	function command.status()
