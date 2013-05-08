@@ -1,9 +1,8 @@
 TODO:
 
-send signals to threads
+thread kill (ends processes)
 killall for script
-killall ends processes
-unload files + killall
+unload files + killall (command..?)
 
 ==== alpha?
 

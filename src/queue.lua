@@ -62,6 +62,9 @@ local function kill(thread)
 	if thread.script then
 		thread.script.threads[thread.id] = nil
 	end
+	if thread.waitSet then
+		thread.waitSet:removeThread(thread)
+	end
 end
 
 function queue.enqueue(thread)
@@ -124,7 +127,7 @@ function wait_mt:waitOn(key)
 	activeThread.waitSet = self
 	activeThread.waitKey = key
 	deactivate(activeThread)
-	coroutine.yield()
+	coroutine.yield() -- <== Coroutine jump here ===========
 end
 
 function wait_mt:resumeOn(key, ...)
@@ -147,6 +150,14 @@ end
 
 function wait_mt:unClear(key)
 	self.clear[key] = nil
+end
+
+function wait_mt:removeThread(thread)
+	local blockedThreads = self.blocked[thread.waitKey]
+	blockedThreads[thread] = nil
+	if #blocked == 0 then
+		self.blocked[thread.waitKey] = nil
+	end
 end
 
 -- resume func is called as resumeFunc(thread, key, ...),
