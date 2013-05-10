@@ -65,6 +65,7 @@ local function kill(thread)
 	if thread.waitSet then
 		thread.waitSet:removeThread(thread)
 	end
+	--print("killed thread# "..thread.id)
 end
 
 function queue.enqueue(thread)
@@ -118,7 +119,7 @@ function wait_mt:waitOn(key)
 	if self.clear[key] then
 		return -- no need to wait
 	end
-	
+
 	local blocked = self.blocked
 	blocked[key] = blocked[key] or {}
 
@@ -155,7 +156,7 @@ end
 function wait_mt:removeThread(thread)
 	local blockedThreads = self.blocked[thread.waitKey]
 	blockedThreads[thread] = nil
-	if #blocked == 0 then
+	if #self.blocked == 0 then
 		self.blocked[thread.waitKey] = nil
 	end
 end
@@ -165,7 +166,7 @@ end
 function queue.newWaitSet(resumeFunc)
 	return setmetatable({
 		blocked = {},
-		clear = {},
+		clear = setmetatable({}, aux.weak_mt),
 		resumeFunc = resumeFunc,
 	}, wait_mt)
 end

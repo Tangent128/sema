@@ -47,7 +47,9 @@ local function grabScript(name, startDown)
 end
 
 function supervise.main()
-	print "start server"
+	do 
+		print "start server"
+	end
 	
 	local serverFd = socket.grabServerSocket()
 	
@@ -120,18 +122,16 @@ function supervise.main()
 		print "server awaiting connections"
 		while true do
 			local accepted = socket.accept(serverFd)
-			--print("accepted fd "..accepted)
 			
 			-- create thread to handle this connection
 			queue.enqueue(supervisor:makeThread(function()
 			
-				local ok, err = pcall(connectionHandler, accepted)
+				connectionHandler(accepted)
 				
-				socket.close(accepted)
-				--print("closed fd "..accepted)
-				if not ok then error(err) end
+				--"accepted" socket will be GC'd
+				--print("done with fd "..accepted.fd)
 				
-			end, "fd "..accepted))
+			end))
 		end
 	end
 	queue.enqueue(supervisor:makeThread(acceptLoop, "accept()"))

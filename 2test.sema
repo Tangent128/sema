@@ -21,8 +21,16 @@ function command.lsenv()
 	end
 end
 
+function command.gc()
+	--for x in DEBUG.pairs(DEBUG.queue.getActive().script.threads) do
+	--DEBUG.print(x)
+	--end
+	DEBUG.collectgarbage("collect")
+end
+
 function command.quit()
 	running = false
+	signal(nil, SIGKILL)
 end
 
 function command.down()

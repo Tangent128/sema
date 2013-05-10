@@ -13,6 +13,7 @@ end
 
 local thread_mt = {}
 thread_mt.__index = thread_mt
+--thread_mt.__gc = function() print "reap thread" end --for debugging proper GC
 
 --[[
      script metatable
@@ -20,6 +21,7 @@ thread_mt.__index = thread_mt
 
 local script_mt = {}
 script_mt.__index = script_mt
+--script_mt.__gc = function() print "reap script" end --for debugging proper GC
 
 function script_mt:makeThread(func)
 	local thread = setmetatable({

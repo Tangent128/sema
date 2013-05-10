@@ -1,4 +1,21 @@
 
+-- defined below
+local close
+
+-- metatable to allow garbage-collecting file descriptors
+local fd_mt = {
+	__gc = function(wrapper)
+		close(wrapper.fd)
+		--print("GC: closed "..wrapper.fd)
+	end
+}
+
+local function wrapFd(fd)
+	return setmetatable({fd = fd}, fd_mt)
+end
+
+-- Functions to establish sockets
+
 local socketPath = nil
 function socket.getSocketPath()
 	if socketPath then
@@ -22,11 +39,11 @@ function socket.grabClientSocket()
 		return clientFd
 	end
 
-	clientFd = socket.cGrabClientSocket(socket.getSocketPath())
+	clientFd = wrapFd(socket.cGrabClientSocket(socket.getSocketPath()))
 
 	if clientFd then
-		poll.addFd(clientFd, "read")
-		socket.buffers[clientFd] = ""
+		poll.addFd(clientFd.fd, "read")
+		socket.buffers[clientFd.fd] = ""
 	end
 
 	return clientFd
@@ -39,11 +56,11 @@ function socket.grabServerSocket()
 		return serverFd
 	end
 
-	serverFd = socket.cGrabServerSocket(socket.getSocketPath())
+	serverFd = wrapFd(socket.cGrabServerSocket(socket.getSocketPath()))
 
 	if serverFd then
-		poll.addFd(serverFd, "read")
-		socket.buffers[serverFd] = ""
+		poll.addFd(serverFd.fd, "read")
+		socket.buffers[serverFd.fd] = ""
 		aux.addExitHook(socket.serverShutdown)
 	end
 
@@ -54,7 +71,8 @@ end
 socket.buffers = {}
 
 --to only be run from a blockable coroutine!
-function socket.accept(serverFd)
+function socket.accept(wrappedServerFd)
+	local serverFd = wrappedServerFd.fd
 	queue.fdBlocked:waitOn(serverFd)
 	
 	-- get connection fd
@@ -64,10 +82,13 @@ function socket.accept(serverFd)
 	poll.addFd(clientFd, "read")
 	socket.buffers[clientFd] = ""
 	
-	return clientFd
+	return wrapFd(clientFd)
 end
 
-function socket.close(fd)
+function close(fd)
+--	if type(fd) == "table" then
+--		fd, fd.fd = fd.fd, nil
+--	end
 	poll.dropFd(fd)
 	socket.buffers[fd] = nil
 	socket.cClose(fd)
@@ -92,7 +113,8 @@ end
      last string length          4
      last string              ????
 --]]
-function socket.sendMessage(fd, message)
+function socket.sendMessage(wrappedFd, message)
+	local fd = wrappedFd.fd
 	--format message body
 	local body = ""
 	for i=1,#message do
@@ -107,7 +129,7 @@ end
 
 local function readBlock(fd)
 	queue.fdBlocked:waitOn(fd)
-	
+
 	local block = socket.cRead(fd)
 	
 	if #block == 0 then
@@ -121,7 +143,9 @@ end
 --assumption: only one coroutine is reading at a time
 --- (later fix: "buffer" -> "buffers[fd]" w/ bookkeeping in accept/close?
 ---  & then extract appropriate chunks)
-function socket.receiveMessage(fd)
+function socket.receiveMessage(wrappedFd)
+	local fd = wrappedFd.fd
+	
 	local buffers = socket.buffers
 	local readBytes = #buffers[fd]
 	
@@ -166,10 +190,7 @@ end
 
 -- prevent client from deleting a socket it created when spawning a server
 function socket.detachServer()
-	if serverFd then
-		socket.close(serverFd)
-		serverFd = nil
-	end
+	serverFd = nil --triggers GC
 end
 
 -- on exit, clean up socket

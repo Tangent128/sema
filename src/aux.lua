@@ -1,6 +1,11 @@
 
 -- misc. functions supplementing os table
 
+-- utility metatable for making tables fully weak
+aux.weak_mt = {
+	__mode = "kv"
+}
+
 -- code to normalize paths
 function aux.absPath(path)
 	local dir, name = path:match("^(.-/?)([^/]-)$")
