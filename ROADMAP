@@ -3,11 +3,13 @@ TODO:
 thread kill (ends processes)
 killall for script
 unload files + killall (command..?)
+ls scripts
+run: set user
 
 ==== alpha?
 
-ls scripts
 usage help
+prettyprint client output
 
 ==== beta?
 
@@ -20,10 +22,10 @@ double check for error conditions/memory leaks/fd leaks
 ==== v0.9
 
 wait for given time
+use
 
 ==== v1.0
 
-use?
 resolve file names to socket path (more realpathness + common prefix?)
 socket activation?
 inotify?

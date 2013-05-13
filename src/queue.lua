@@ -56,7 +56,7 @@ local function deactivate(thread)
 	end
 end
 
-local function kill(thread)
+function queue.kill(thread)
 	activeSet[thread] = nil
 	liveSet[thread] = nil
 	if thread.script then
@@ -73,7 +73,7 @@ function queue.enqueue(thread)
 	co = thread.coroutine or coroutine.create(function()
 		thread.func()
 		-- cleanup
-		kill(thread)
+		queue.kill(thread)
 	end)
 	thread.coroutine = co
 	liveSet[thread] = thread
@@ -88,7 +88,7 @@ function queue.runActive()
 		local ok, err = coroutine.resume(thread.coroutine)
 		if not ok then
 			print(err)
-			kill(thread)
+			queue.kill(thread)
 		end
 	end
 end
@@ -182,6 +182,15 @@ queue.threadBlocked = queue.newWaitSet()
 queue.pidBlocked = queue.newWaitSet(function(thread, pid, status)
 	thread.pidExitStatus = status
 end)
+
+-- by design, only one thread at a time is blocked on a PID;
+-- if that gets killed, force-kill the child too (TODO: be less harsh?)
+function queue.pidBlocked:removeThread(thread)
+	local pid = thread.waitKey
+	signal.sendSignal(pid, signal.SIGKILL)
+	--default:
+	wait_mt.removeThread(self, thread)
+end
 
 -- Threads blocked on file descriptor reads
 queue.fdBlocked = queue.newWaitSet()
