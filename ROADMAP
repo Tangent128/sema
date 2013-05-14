@@ -1,9 +1,9 @@
 TODO:
 
-thread kill (ends processes)
 killall for script
-unload files + killall (command..?)
 ls scripts
+thread kill by id
+unload files + killall (command..?)
 run: set user
 
 ==== alpha?

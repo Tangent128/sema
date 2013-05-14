@@ -70,11 +70,14 @@ function supervise.main()
 	     {"OK", informationMessage} (ends connection)
 	     {"ERROR", explanationMessage} (ends connection)
 	--]]
+	local doScriptCommand, doSemaCommand
 	local function connectionHandler(fd)
 			
 		local activeThread = queue.getActive()
 		
 		local message = socket.receiveMessage(fd)
+		
+		-- setup function to route command results back to client
 		activeThread.reply = function(msg)
 			pcall(socket.sendMessage, fd, msg)
 			
@@ -91,8 +94,19 @@ function supervise.main()
 		end
 		
 		local scriptName = message[1]
-		local commandName = message[2]
 		
+		if #scriptName > 0 then
+			doScriptCommand(activeThread, unpack(message))
+		else
+			-- null scriptName, call special command handler
+			-- handle stuff like killall script, quit server, etc
+		end
+		
+	end
+	
+	-- handle command to be passed to a script
+	function doScriptCommand(activeThread, scriptName, commandName, ...)
+	
 		local activeScript = grabScript(scriptName, commandName == "down")
 		
 		activeScript:adoptThread(activeThread)
@@ -112,12 +126,12 @@ function supervise.main()
 			return
 		end
 		
-		command( select(3, unpack(message)) )
+		command(...)
 		
 		activeThread.reply {"OK", "Done."}
-		
 	end
 	
+	-- top-level loop for processing client connections
 	local function acceptLoop()
 		print "server awaiting connections"
 		while true do
@@ -134,11 +148,11 @@ function supervise.main()
 			end))
 		end
 	end
-	queue.enqueue(supervisor:makeThread(acceptLoop, "accept()"))
+	queue.enqueue(supervisor:makeThread(acceptLoop))
 
 	queue.eventLoopMain()
 	
-	print "done"	
+	print "done"
 
 	aux.shutdown()
 end
