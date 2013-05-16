@@ -14,6 +14,9 @@ end
 local thread_mt = {}
 thread_mt.__index = thread_mt
 --thread_mt.__gc = function() print "reap thread" end --for debugging proper GC
+function thread_mt:kill()
+	queue.kill(self)
+end
 
 --[[
      script metatable
@@ -49,6 +52,13 @@ function script_mt:adoptThread(thread)
 	thread.script = self
 	self.threads[thread.id] = thread
 	
+end
+
+-- end all threads belonging to a script
+function script_mt:killAll()
+	for id, thread in pairs(self.threads) do
+		thread:kill()
+	end
 end
 
 --[[

@@ -26,14 +26,30 @@ local function grabScript(name, startDown)
 		
 			-- run script chunk
 			local ok, err = pcall(func)
-			-- TODO: remove debug print once script ls is a thing
-			print("main done "..name)
 			
-			--TODO: killall threads in script
-			scriptMap[name] = nil
+			mainThread:kill()
 			
 			if not ok then error(err) end
 		end, name)
+		
+		-- make kill of main thread do cleanup
+		local baseKill = mainThread.kill
+		function mainThread:kill()
+			-- default behavior
+			-- runs first to ensure killAll() below does not infinite-recurse into this
+			baseKill(self)
+			
+			-- TODO: remove debug print once script ls is a thing
+			print("main done "..name)
+			
+			-- killall remaining threads in script
+			newScript:killAll()
+			
+			-- cleanup script
+			scriptMap[name] = nil
+			
+		end
+		
 	else
 		error(err)
 	end

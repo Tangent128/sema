@@ -1,6 +1,5 @@
 TODO:
 
-killall for script
 ls scripts
 thread kill by id
 unload files + killall (command..?)
