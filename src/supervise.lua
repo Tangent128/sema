@@ -11,12 +11,15 @@ local function grabScript(name, startDown)
 	end
 	
 	local newScript = script.makeScript()
-	scriptMap[name] = newScript
 	
 	local func, err = loadfile(name, "bt", newScript.env)
-	
+
 	local mainThread
 	if func then
+		
+		-- remember script
+		scriptMap[name] = newScript
+		
 		mainThread = newScript:makeThread(function()
 			
 			-- insure service is up
@@ -156,7 +159,14 @@ function supervise.main()
 			-- create thread to handle this connection
 			queue.enqueue(supervisor:makeThread(function()
 			
-				connectionHandler(accepted)
+				local ok, err = pcall(connectionHandler, accepted)
+				
+				if err then
+					socket.sendMessage(accepted, {
+						"ERROR",
+						tostring(err)
+					})
+				end
 				
 				--"accepted" socket will be GC'd
 				--print("done with fd "..accepted.fd)

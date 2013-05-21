@@ -25,6 +25,12 @@ if args[1] and args[1]:match "^[-][-]" then
 	elseif args[1] == "--client" and #args >= 2 then
 		mode = "client"
 		action = "command"
+	elseif args[1] == "--ls" and #args == 1 then
+		mode = "client"
+		action = "ls"
+	elseif args[1] == "--kill" and #args == 2 then
+		mode = "client"
+		action = "killScript"
 	elseif args[1] == "--debug" then
 		mode = "client"
 		action = "debug"

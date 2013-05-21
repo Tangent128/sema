@@ -77,6 +77,17 @@ function control.main(action, ...)
 			end
 
 		end
+	elseif action == "ls" then
+		actionFunc = function()
+			socket.sendMessage(clientFd, {"\0", "ls"})
+			printReplies()
+		end
+	elseif action == "killScript" then
+		actionFunc = function()
+			local scriptPath = checkScript(args[1])
+			socket.sendMessage(clientFd, {"\0", "killScript", scriptPath})
+			printReplies()
+		end
 	end
 	
 	-- execute
