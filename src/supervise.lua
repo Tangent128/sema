@@ -114,11 +114,12 @@ function supervise.main()
 		
 		local scriptName = message[1]
 		
-		if #scriptName > 0 then
-			doScriptCommand(activeThread, unpack(message))
-		else
+		if scriptName == "\0" then
 			-- null scriptName, call special command handler
 			-- handle stuff like killall script, quit server, etc
+			doSemaCommand(activeThread, select(2, unpack(message)))
+		else
+			doScriptCommand(activeThread, unpack(message))
 		end
 		
 	end
@@ -150,6 +151,25 @@ function supervise.main()
 		activeThread.reply {"OK", "Done."}
 	end
 	
+	-- handle global-state command
+	function doSemaCommand(activeThread, commandName, ...)
+		
+		if commandName == "ls" then
+	
+			for name, script in pairs(scriptMap) do
+				activeThread.reply {"LS", name}
+				
+				-- TODO: print child procs
+			end
+			
+		elseif commandName == "killScript" then
+			-- killall
+		end
+		
+		activeThread.reply {"OK", "Done."}
+		
+	end
+	
 	-- top-level loop for processing client connections
 	local function acceptLoop()
 		print "server awaiting connections"
@@ -166,6 +186,9 @@ function supervise.main()
 						"ERROR",
 						tostring(err)
 					})
+					
+					-- pass error up chain for server-side reporting too
+					error(err)
 				end
 				
 				--"accepted" socket will be GC'd
