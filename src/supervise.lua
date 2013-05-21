@@ -169,7 +169,14 @@ function supervise.main()
 			end
 			
 		elseif commandName == "killScript" then
-			-- killall
+			
+			local scriptName = ...
+			local script = scriptMap[scriptName]
+			
+			if script then
+				script:killAll()
+				activeThread.reply {"KILLED", scriptName}
+			end
 		end
 		
 		activeThread.reply {"OK", "Done."}
