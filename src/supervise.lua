@@ -155,11 +155,17 @@ function supervise.main()
 	function doSemaCommand(activeThread, commandName, ...)
 		
 		if commandName == "ls" then
-	
+			-- print running scripts
 			for name, script in pairs(scriptMap) do
-				activeThread.reply {"LS", name}
+				activeThread.reply {"SCRIPT", name}
 				
-				-- TODO: print child procs
+				-- print child procs
+				for id, thread in pairs(script.threads) do
+					if thread.waitSet == queue.pidBlocked then
+						--TODO: scrounge up more information
+						activeThread.reply {"PID", thread.waitKey}
+					end
+				end
 			end
 			
 		elseif commandName == "killScript" then
