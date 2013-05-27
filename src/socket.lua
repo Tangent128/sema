@@ -11,6 +11,8 @@ local fd_mt = {
 }
 
 local function wrapFd(fd)
+	-- propagate nil
+	if fd == nil then return nil end
 	return setmetatable({fd = fd}, fd_mt)
 end
 
