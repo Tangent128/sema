@@ -54,10 +54,18 @@ static int absPath(lua_State *L) {
 }
 
 
+static int getUID(lua_State *L) {
+
+	lua_pushinteger(L, getuid());
+	
+	return 1;
+}
+
 
 static const luaL_Reg auxFuncs[] = {
 	{ "modeFork", &modeFork },
 	{ "cAbsPath", &absPath},
+	{ "getUID", &getUID},
 	{ NULL, NULL }
 };
 

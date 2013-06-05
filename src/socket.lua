@@ -18,19 +18,33 @@ end
 
 -- Functions to establish sockets
 
+local function tryVar(name, suffix)
+	local value = os.getenv(name)
+	if value then
+		return value .. (suffix or "")
+	else
+		return nil
+	end
+end
+
 local socketPath = nil
 function socket.getSocketPath()
 	if socketPath then
 		return socketPath
 	end
 
-	--TODO: base default off $HOME? or?
-	-- $HOME/.sema/control.socket ?
-	--error("No control socket path available; try setting either $SEMA_SOCKET or $HOME.")
-	socketPath = os.getenv("SEMA_SOCKET") or "./sema.socket"
-	
-	socketPath = aux.absPath(socketPath)
+	if aux.getUID() == 0 then
+		socketPath = tryVar("SEMA_SOCKET")
+		or "/run/sema.socket"
+	else
+		socketPath = tryVar("SEMA_SOCKET")
+		or tryVar("XDG_RUNTIME_DIR", "/sema.socket")
+		or tryVar("HOME", "/.sema.socket")
+		or error("No control socket path available; try setting either $SEMA_SOCKET, $XDG_RUNTIME_DIR, or $HOME.")
+	end
 
+	socketPath = aux.absPath(socketPath)
+	
 	return socketPath
 end
 
