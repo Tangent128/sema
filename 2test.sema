@@ -39,6 +39,24 @@ function command.down()
 	signal(nil, SIGKILL)
 end
 
+local bsleep = parallel(function()
+	--DEBUG.print"bsleep"
+	local i = 1
+	while true do
+		i = i + 1
+		waitEvent "breset"
+		run {
+			"sleep", DEBUG.tostring(i)
+		}
+		DEBUG.print "bsleep!"
+	end
+end)
+
+function command.breset()
+	signal(bsleep, SIGKILL)
+	triggerEvent"breset"
+end
+
 --DEBUG.print(threadName())
 
 while running do

@@ -1,11 +1,16 @@
 TODO:
 
 run: set user
+parallel
 
 ==== alpha?
 
+script loading
+
 usage help
 prettyprint client output
+
+pipes
 
 ==== beta?
 
@@ -26,6 +31,4 @@ resolve file names to socket path (more realpathness + common prefix?)
 socket activation?
 inotify?
 metrics?
-log pipe?
-input pipe?
 

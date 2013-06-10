@@ -72,6 +72,12 @@ function queue.enqueue(thread)
 	local co
 	co = thread.coroutine or coroutine.create(function()
 		thread.func()
+		
+		--[[xpcall(thread.func(), function(err)
+			error(debug.traceback(err))
+		end)
+		--]]
+		
 		-- cleanup
 		queue.kill(thread)
 	end)
@@ -83,7 +89,12 @@ end
 -- assumption: the thread dispatch loop is non-reentrant
 local activeThread
 function queue.runActive()
+	-- duplicate list of active threads to allow the list to be added to during loop
+	local copy = {}
 	for thread in pairs(activeSet) do
+		copy[thread] = true
+	end
+	for thread in pairs(copy) do
 		activeThread = thread
 		local ok, err = coroutine.resume(thread.coroutine)
 		if not ok then

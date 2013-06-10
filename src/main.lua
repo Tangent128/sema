@@ -1,4 +1,8 @@
 
+--wrap error handler
+
+xpcall(function(...)
+
 --[[
      S E T T I N G S
 --]]
@@ -64,7 +68,6 @@ if mode == "spawn" then
 end
 
 -- start appropriate code path
-
 if mode == "client" then
 	socket.detachServer()
 	control.main(action, select(argStartIndex, unpack(args)))
@@ -73,4 +76,9 @@ elseif mode == "server" then
 else
 	error("Somehow got an invalid mode: "..mode)
 end
+
+-- print stacktrace on toplevel error
+end, function(err)
+	print( debug.traceback(err, 2))
+end, ...)
 

@@ -42,9 +42,6 @@ local function grabScript(name, startDown)
 			-- runs first to ensure killAll() below does not infinite-recurse into this
 			baseKill(self)
 			
-			-- TODO: remove debug print once script ls is a thing
-			print("main done "..name)
-			
 			-- killall remaining threads in script
 			newScript:killAll()
 			

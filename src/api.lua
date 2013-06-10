@@ -27,6 +27,14 @@ function api.reply(...)
 	end
 end
 
+-- spawn a thread in parallel
+function api.parallel(func)
+	local thread = current().script:makeThread(func)
+	queue.enqueue(thread)
+	return {id = thread.id}
+end
+
+
 --[[
 	Process-control functions
 --]]
