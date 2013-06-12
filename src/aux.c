@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <pwd.h>
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -61,11 +62,37 @@ static int getUID(lua_State *L) {
 	return 1;
 }
 
+// accepts string for username, or number for UID
+// returns (uid, name)
+static int userInfo(lua_State *L) {
+	
+	struct passwd *pw = NULL;
+	
+	int type = lua_type(L, 1);
+	
+	// lookup user
+	if(type == LUA_TSTRING) {
+		pw = getpwnam(luaL_checkstring(L, 1));
+	} else if(type == LUA_TNUMBER) {
+		pw = getpwuid(luaL_checkinteger(L, 1));
+	}
+	
+	// extract uid & name
+	if(pw != NULL) {
+		lua_pushinteger(L, pw->pw_uid);
+		lua_pushstring(L, pw->pw_name);
+	} else {
+		lua_pushnil(L);
+		lua_pushnil(L);
+	}
+	return 2;
+}
 
 static const luaL_Reg auxFuncs[] = {
 	{ "modeFork", &modeFork },
 	{ "cAbsPath", &absPath},
 	{ "getUID", &getUID},
+	{ "userInfo", &userInfo},
 	{ NULL, NULL }
 };
 
