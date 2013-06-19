@@ -13,16 +13,24 @@ static int size = 1;
 
 static int poll_add_fd(lua_State *L) {
 	
+	// read params (fd, why)
+	int fd = luaL_checkint(L, 1);
+	int why = luaL_checkint(L, 2);
+
 	// check size/initialize list
 	if(nfds >= size || fds == NULL) {
 		size = size * 2;
 		fds = realloc(fds, sizeof(struct pollfd) * size);
-		reasons = realloc(reasons, sizeof(int) * size);
+		int *biggerReasons = realloc(reasons, sizeof(int) * size);
+		
+		if(biggerReasons == NULL) {
+			close(fd);
+			lua_pushstring(L, "not enough memory to open a new fd");
+			lua_error(L);
+		}
+		
+		reasons = biggerReasons;
 	}
-	
-	// read params (fd, why)
-	int fd = luaL_checkint(L, 1);
-	int why = luaL_checkint(L, 2);
 	
 	// check for existing fd
 	int i;

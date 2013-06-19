@@ -206,7 +206,7 @@ end
 
 -- prevent client from deleting a socket it created when spawning a server
 function socket.detachServer()
-	serverFd = nil --triggers GC
+	serverFd = nil --no leak, will trigger GC
 end
 
 -- on exit, clean up socket
