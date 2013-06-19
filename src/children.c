@@ -40,10 +40,17 @@ static int run(lua_State *L) {
 		return 1;
 	}
 	
+	// we are the child, set up enviroment
+	
+	// set user (if able to)
+	
 	// prepare to exec the child process
 	
-	//typedef char * ConstString;
 	const char ** argv = malloc((argc + 1) * sizeof(char*));
+	if(argv == NULL) {
+		perror("malloc");
+		exit(1);
+	}
 	
 	for(i = argvStart; i <= argc; i++) {
 		argv[i-1] = luaL_checkstring(L, i);
