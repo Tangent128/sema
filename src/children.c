@@ -8,22 +8,27 @@
 
 static int run(lua_State *L) {
 	
-	// check arguments
-	// args: (argv...)
-	
-	int argc = lua_gettop(L);
-	int i = 1;
-	
+	// check argument is a table
+	// numeric indices are argv
+	// .user is a string username or a numeric UID to switch to if possible
 
-	// argv
+	luaL_checktype(L, 1, LUA_TTABLE);
 	
-	if(argc < i) {
+	int argc = lua_rawlen(L, 1);
+	int i;
+	
+	// argv check
+	
+	if(argc < 1) {
 		return luaL_error(L, "No command provided to run.");
 	}
 	
-	int argvStart = i;
-	for(; i <= argc; i++) {
-		luaL_checkstring(L, i);
+	// loop through numeric indicies, ensure all are strings
+	for(i = 1; i <= argc; i++) {
+		lua_pushinteger(L, i);
+		lua_gettable(L, 1);
+		luaL_checkstring(L, -1);
+		lua_pop(L, 1);
 	}
 	
 	// OK, sanity check done, prepare child
@@ -52,8 +57,11 @@ static int run(lua_State *L) {
 		exit(1);
 	}
 	
-	for(i = argvStart; i <= argc; i++) {
-		argv[i-1] = luaL_checkstring(L, i);
+	// collect argv strings
+	for(i = 1; i <= argc; i++) {
+		lua_pushinteger(L, i);
+		lua_gettable(L, 1);
+		argv[i-1] = luaL_checkstring(L, -1);
 	}
 	argv[argc] = NULL;
 	
