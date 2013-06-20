@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <grp.h>
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -16,6 +17,8 @@ static int run(lua_State *L) {
 	
 	int argc = lua_rawlen(L, 1);
 	int i;
+	
+	luaL_checkstack(L, argc+2, "not enough stack space to spawn child");
 	
 	// argv check
 	
@@ -48,6 +51,19 @@ static int run(lua_State *L) {
 	// we are the child, set up enviroment
 	
 	// set user (if able to)
+	lua_getfield(L, 1, "user");
+	if(lua_isnumber(L, -1)) {
+		int uid = lua_tointeger(L, -1);
+		setuid(uid);
+		
+		// if changing user, change group too
+		lua_getfield(L, 1, "group");
+		int gid = lua_tointeger(L, -1);
+		setgid(gid);
+		
+		// clear excess groups
+		setgroups(0, NULL);
+	}
 	
 	// prepare to exec the child process
 	

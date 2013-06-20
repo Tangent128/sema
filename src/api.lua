@@ -46,6 +46,11 @@ function api.run(tbl, ...)
 		return api.run{tbl, ...}
 	end
 	
+	-- normalize setuid/setgid
+	local uid, name, gid = aux.userInfo(tbl.user)
+	tbl.user = uid
+	tbl.group = gid
+	
 	-- run child process
 	local pid = children.run(tbl)
 	queue.pidBlocked:waitOn(pid)
