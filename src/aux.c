@@ -63,7 +63,7 @@ static int getUID(lua_State *L) {
 }
 
 // accepts string for username, or number for UID
-// returns (uid, name, gid)
+// returns (uid, name, gid, home)
 static int userInfo(lua_State *L) {
 	
 	struct passwd *pw = NULL;
@@ -82,7 +82,8 @@ static int userInfo(lua_State *L) {
 		lua_pushinteger(L, pw->pw_uid);
 		lua_pushstring(L, pw->pw_name);
 		lua_pushinteger(L, pw->pw_gid);
-		return 3;
+		lua_pushstring(L, pw->pw_dir);
+		return 4;
 	} else {
 		lua_pushnil(L);
 		return 1;
