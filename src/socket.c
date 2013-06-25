@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -90,7 +91,23 @@ static int acceptConnection(lua_State *L) {
 	return 1;
 }
 
-static int closeConnection(lua_State *L) {
+static int makePipe(lua_State *L) {
+
+	int fds[2];
+	int status = pipe(fds);
+	
+	if(status != 0) {
+		perror("pipe");
+		return luaL_error(L, "Couldn't make pipe pair.");
+	}
+	
+	lua_pushinteger(L, fds[0]);
+	lua_pushinteger(L, fds[1]);
+	
+	return 2;
+}
+
+static int closeFd(lua_State *L) {
 	
 	int fd = luaL_checkinteger(L, 1);
 	
@@ -160,9 +177,10 @@ static const luaL_Reg socketFuncs[] = {
 	{ "cGrabServerSocket", &grabServerSocket },
 	{ "cGrabClientSocket", &grabClientSocket },
 	{ "cAccept", &acceptConnection },
+	{ "cPipe", &makePipe },
 	{ "cRead", &readFromConnection },
 	{ "cWrite", &writeToConnection },
-	{ "cClose", &closeConnection },
+	{ "cClose", &closeFd },
 	{ "cUnlink", &unlinkL },
 	
 	/* no wrapping needed */

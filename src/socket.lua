@@ -11,8 +11,10 @@ local fd_mt = {
 }
 
 local function wrapFd(fd)
+	
 	-- propagate nil
 	if fd == nil then return nil end
+	
 	return setmetatable({fd = fd}, fd_mt)
 end
 
@@ -101,10 +103,8 @@ function socket.accept(wrappedServerFd)
 	return wrapFd(clientFd)
 end
 
+-- close function, works for both sockets and pipes
 function close(fd)
---	if type(fd) == "table" then
---		fd, fd.fd = fd.fd, nil
---	end
 	poll.dropFd(fd)
 	socket.buffers[fd] = nil
 	socket.cClose(fd)
@@ -117,7 +117,7 @@ end
      =============================
      content                #bytes
      -------                 -----
-     "sema"                      4
+     ASCII/UTF-8 "sema"          4
      version byte (0x00)         1
      payload length              4
      <end of 9-byte header>
@@ -215,4 +215,14 @@ function socket.serverShutdown()
 		socket.cUnlink(socket.getSocketPath())
 	end
 end
+
+-- Functions to make/write-to pipes
+
+function socket.pipe()
+	local inFd, outFd = socket.cPipe()
+	
+	-- does not register polling on fds, as we don't currently read from them
+	return wrapFd(inFd), wrapFd(outFd)
+end
+
 
