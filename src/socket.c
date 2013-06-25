@@ -41,6 +41,9 @@ static int grabServerSocket(lua_State *L) {
 		return luaL_error(L, "Couldn't listen on server socket");
 	}
 	
+	// don't pass socket fd to children unintentionally
+	fcntl(server, F_SETFD, FD_CLOEXEC);
+	
 	lua_pushinteger(L, server);
 	return 1;
 }
@@ -77,6 +80,9 @@ static int grabClientSocket(lua_State *L) {
 	}
 	//printf("%d\n", result);
 	
+	// don't pass socket fd to children unintentionally
+	fcntl(client, F_SETFD, FD_CLOEXEC);
+
 	lua_pushinteger(L, client);
 	return 1;
 }
@@ -86,6 +92,9 @@ static int acceptConnection(lua_State *L) {
 	int serverSocket = luaL_checkinteger(L, 1);
 
 	int newConnection = accept(serverSocket, NULL, NULL);
+	
+	// don't pass socket fd to children unintentionally
+	fcntl(newConnection, F_SETFD, FD_CLOEXEC);
 	
 	lua_pushinteger(L, newConnection);
 	return 1;
@@ -100,6 +109,10 @@ static int makePipe(lua_State *L) {
 		perror("pipe");
 		return luaL_error(L, "Couldn't make pipe pair.");
 	}
+	
+	// don't pass pipe fds to children unintentionally
+	fcntl(fds[0], F_SETFD, FD_CLOEXEC);
+	fcntl(fds[1], F_SETFD, FD_CLOEXEC);
 	
 	lua_pushinteger(L, fds[0]);
 	lua_pushinteger(L, fds[1]);
