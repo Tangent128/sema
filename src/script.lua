@@ -71,13 +71,14 @@ function script.makeScript(name)
 		events = queue.newWaitSet(),
 		name = name,
 		threads = {},
+		fds = setmetatable({}, aux.weak_k_mt),
 		main = nil, --set in supervise.lua, grabScript()
 	}, script_mt)
 	return context
 end
 
 -- script _ENV metatable
--- needs to be seperate from index table (defined in api.lua) to prevent accessing it via __index
+-- needs to be separate from index table (defined in api.lua) to prevent accessing it via __index
 local env_mt = {}
 env_mt.__index = api -- see api.lua
 

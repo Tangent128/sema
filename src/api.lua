@@ -7,6 +7,16 @@ api = {}
 
 local current = queue.getActive
 
+local function proxyFd(fd)
+	local proxy = {}
+	current().script.fds[proxy] = fd
+	return proxy
+end
+
+local function unproxyFd(proxy)
+	return current().script.fds[proxy]
+end
+
 --[[
 	General functions
 --]]
@@ -50,6 +60,17 @@ function api.run(tbl, ...)
 	local uid, name, gid = aux.userInfo(tbl.user)
 	tbl.user = uid
 	tbl.group = gid
+	
+	-- build fd map
+	local fds = {0,1,2}
+	
+	for fd, name in pairs{"stdin", "stdout", "stderr"} do
+		if tbl[name] and unproxyFd(tbl[name]) then
+			fds[fd] = unproxyFd(tbl[name])
+		end
+	end
+	
+	tbl.fdMap = fds
 	
 	-- run child process
 	local pid = children.run(tbl)
@@ -97,6 +118,20 @@ for name, num in pairs(signal) do
 	if type(name) == "string" and name:sub(1,3) == "SIG" then
 		api[name] = num
 	end
+end
+
+--[[
+     Pipe functions
+--]]
+
+function api.pipe()
+	local inFd, outFd = socket.pipe()
+	
+	--TODO: add write function to input proxy
+	return {
+		input = proxyFd(inFd),
+		output = proxyFd(outFd),
+	}
 end
 
 --[[
