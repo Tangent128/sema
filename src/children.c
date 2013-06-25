@@ -1,6 +1,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 #include <grp.h>
 
@@ -48,22 +49,44 @@ static int run(lua_State *L) {
 		return 1;
 	}
 	
-	// we are the child, set up enviroment
+	
+	// we are the child at this point, set up enviroment
 	
 	// set user (if able to)
 	lua_getfield(L, 1, "user");
 	if(lua_isnumber(L, -1)) {
 		int uid = lua_tointeger(L, -1);
+		
 		setuid(uid);
 		
 		// if changing user, change group too
 		lua_getfield(L, 1, "group");
 		int gid = lua_tointeger(L, -1);
+		lua_pop(L, 1);
+		
 		setgid(gid);
 		
 		// clear excess groups
 		setgroups(0, NULL);
 	}
+	lua_pop(L, 1);
+	
+	// traverse fdMap table & map fds
+	// TODO: actually map fds (& maybe delegate to lua code, kinda hairy...)
+	lua_getfield(L, 1, "fdMap");
+	int numFds = lua_rawlen(L, -1);
+	for(i = 1; i <= numFds; i++) {
+		lua_pushinteger(L, i);
+		lua_gettable(L, -2);
+
+		int fd = lua_tointeger(L, -1);
+		lua_pop(L, 1);
+		
+		// clear close-on-execute status
+		fcntl(fd, F_SETFD, 0);
+		
+	}
+	lua_pop(L, 1);
 	
 	// prepare to exec the child process
 	
@@ -73,7 +96,7 @@ static int run(lua_State *L) {
 		exit(1);
 	}
 	
-	// collect argv strings
+	// collect argv strings (need to be left on stack for GC safety)
 	for(i = 1; i <= argc; i++) {
 		lua_pushinteger(L, i);
 		lua_gettable(L, 1);

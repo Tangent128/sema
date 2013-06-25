@@ -66,7 +66,7 @@ function api.run(tbl, ...)
 	
 	for fd, name in pairs{"stdin", "stdout", "stderr"} do
 		if tbl[name] and unproxyFd(tbl[name]) then
-			fds[fd] = unproxyFd(tbl[name])
+			fds[fd] = unproxyFd(tbl[name]).fd
 		end
 	end
 	
