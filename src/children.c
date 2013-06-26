@@ -74,7 +74,7 @@ static int run(lua_State *L) {
 	
 	// traverse fdMap table & map fds
 	// TODO: actually map fds (& maybe delegate to lua code, kinda hairy...)
-	lua_getfield(L, 1, "fdMap");
+	/*lua_getfield(L, 1, "fdMap");
 	int numFds = lua_rawlen(L, -1);
 	for(i = 1; i <= numFds; i++) {
 		lua_pushinteger(L, i);
@@ -88,7 +88,10 @@ static int run(lua_State *L) {
 		//printf("sticking fs %d\n", fd);
 		
 	}
-	lua_pop(L, 1);
+	lua_pop(L, 1);*/
+	
+	lua_getfield(L, 1, "fdMapper");
+	lua_call(L, 0, 0);
 	
 	// prepare to exec the child process
 	

@@ -71,6 +71,7 @@ function api.run(tbl, ...)
 	end
 	
 	-- fd mapping is handled Lua-side for simplification
+	-- this is called post-fork, in the child
 	tbl.fdMapper = function()
 		local floor = #fds + 1 -- ensure we are out of range of fd table
 		
