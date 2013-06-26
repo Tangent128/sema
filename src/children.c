@@ -51,6 +51,7 @@ static int run(lua_State *L) {
 	
 	
 	// we are the child at this point, set up enviroment
+	// ==================
 	
 	// set user (if able to)
 	lua_getfield(L, 1, "user");
@@ -84,6 +85,7 @@ static int run(lua_State *L) {
 		
 		// clear close-on-execute status
 		fcntl(fd, F_SETFD, 0);
+		//printf("sticking fs %d\n", fd);
 		
 	}
 	lua_pop(L, 1);
@@ -130,6 +132,45 @@ static int waitChildren(lua_State *L) {
 	return 1;
 }
 
+// puntFd(fd, above)
+// returns new fd (which will have CLOEXEC set)
+// only expected to be called in a forked child, and thus exits on error!
+static int puntFd(lua_State *L) {
+	
+	int fd = luaL_checkinteger(L, 1);
+	int floor = luaL_checkinteger(L, 2);
+	
+	int punted = fcntl(fd, F_DUPFD, floor);
+	if(punted == -1) {
+		perror("fcntl/F_DUPFD");
+		exit(1);
+	}
+	
+	// punting is for temporary holding, no need to keep post-exec
+	fcntl(punted, F_SETFD, FD_CLOEXEC);
+	
+	lua_pushinteger(L, punted);
+	
+	return 1;
+}
+
+// dupTo(from, to)
+// copies a file descriptor, without the CLOEXEC flag
+// only expected to be called in a forked child, and thus exits on error!
+static int dupTo(lua_State *L) {
+	
+	int fd = luaL_checkinteger(L, 1);
+	int target = luaL_checkinteger(L, 2);
+	
+	int status = dup2(fd, target);
+	if(status == -1) {
+		perror("dup2");
+		exit(1);
+	}
+	
+	return 0;
+}
+
 //static int (lua_State *L) {
 //	return 0;
 //}
@@ -137,6 +178,8 @@ static int waitChildren(lua_State *L) {
 static const luaL_Reg childFuncs[] = {
 	{ "run", &run },
 	{ "wait", &waitChildren },
+	{ "puntFd", &puntFd },
+	{ "dupTo", &dupTo },
 	{ NULL, NULL }
 };
 

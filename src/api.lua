@@ -61,16 +61,40 @@ function api.run(tbl, ...)
 	tbl.user = uid
 	tbl.group = gid
 	
-	-- build fd map
-	local fds = {0,1,2}
+	-- build fd map - starts numbering at zero for fd compatability!
+	local fds = {[0] = 0,1,2}
 	
-	for fd, name in pairs{"stdin", "stdout", "stderr"} do
+	for fd, name in pairs{[0] = "stdin", "stdout", "stderr"} do
 		if tbl[name] and unproxyFd(tbl[name]) then
 			fds[fd] = unproxyFd(tbl[name]).fd
 		end
 	end
 	
-	tbl.fdMap = fds
+	-- fd mapping is handled Lua-side for simplification
+	tbl.fdMapper = function()
+		local floor = #fds + 1 -- ensure we are out of range of fd table
+		
+		-- ensure relevant fds "out of the way"
+		local i = 0
+		while fds[i] ~= nil do
+			if fds[i] ~= false then
+				fds[i] = children.puntFd(fds[i], floor)
+			end
+			i = i + 1
+		end
+		
+		-- place them
+		i = 0
+		while fds[i] ~= nil do
+			if fds[i] == false then
+				socket.cClose(i)
+			else
+				children.dupTo(fds[i], i)
+			end
+			i = i + 1
+		end
+
+	end
 	
 	-- run child process
 	local pid = children.run(tbl)
