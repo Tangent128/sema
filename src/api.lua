@@ -113,6 +113,15 @@ function api.runIfUp(...)
 	return api.run(...)
 end
 
+-- split a simple command line string for a run{} command
+-- does nothing about quotes, envvars, etc, just splits on whitespace
+function api.cmd(cmdline)
+	local words = {}
+	for word in cmdline:gmatch("[^%s]+") do
+		words[#words + 1] = word
+	end
+	return table.unpack(words)
+end
 
 -- signal a child process
 function api.signal(threadID, signum)
