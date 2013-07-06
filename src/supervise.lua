@@ -24,7 +24,7 @@ local function grabScript(name, startDown)
 			
 			-- insure service is up
 			if not startDown then
-				api.setEvent("up")
+				newScript.events:resumeOnAndClear("up")
 			end
 		
 			-- run script chunk

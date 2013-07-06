@@ -7,7 +7,7 @@ script loading
 usage help
 prettyprint client output
 
-pipes
+pipes, writing to
 
 ==== beta?
 
@@ -26,6 +26,7 @@ use
 
 resolve file names to socket path (more realpathness + common prefix?)
 socket activation?
+writes should block coroutines on full pipe
 inotify?
 metrics?
 

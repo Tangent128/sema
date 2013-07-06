@@ -1,6 +1,10 @@
 
 api = {}
 
+-- functions to expose as globals to scripts
+api.export = {}
+local API = api.export
+
 --[[
 	Script-side API functions
 --]]
@@ -22,13 +26,13 @@ end
 --]]
 
 -- get name of current thread
-function api.scriptName()
+function API.scriptName()
 	return current().script.name
 end
 
 -- send a message back to the client that spawned this command
 -- (only works from a command handler)
-function api.reply(...)
+function API.reply(...)
 	local reply = current().reply
 	if reply then
 		reply{"STATUS", ...}
@@ -38,7 +42,7 @@ function api.reply(...)
 end
 
 -- spawn a thread in parallel
-function api.parallel(func)
+function API.parallel(func)
 	local thread = current().script:makeThread(func)
 	queue.enqueue(thread)
 	return {id = thread.id}
@@ -50,10 +54,10 @@ end
 --]]
 
 -- spawn a child process and wait for exit
-function api.run(tbl, ...)
+function API.run(tbl, ...)
 	-- normalize arguments
 	if type(tbl) ~= "table" then
-		return api.run{tbl, ...}
+		return API.run{tbl, ...}
 	end
 	
 	-- normalize setuid/setgid
@@ -105,17 +109,17 @@ end
 
 -- run{}, but blocks if service is down
 -- conciseness function
-function api.runIfUp(...)
+function API.runIfUp(...)
 	-- insure we are not down
-	api.waitEvent "up"
+	API.waitEvent "up"
 	
 	-- pass through
-	return api.run(...)
+	return API.run(...)
 end
 
 -- split a simple command line string for a run{} command
 -- does nothing about quotes, envvars, etc, just splits on whitespace
-function api.cmd(cmdline)
+function API.cmd(cmdline)
 	local words = {}
 	for word in cmdline:gmatch("[^%s]+") do
 		words[#words + 1] = word
@@ -124,7 +128,7 @@ function api.cmd(cmdline)
 end
 
 -- signal a child process
-function api.signal(threadID, signum)
+function API.signal(threadID, signum)
 
 	-- get the intended ID
 	local idType = type(threadID)
@@ -147,10 +151,10 @@ function api.signal(threadID, signum)
 	end
 end
 
--- splice in signal constants
+-- export signal constants
 for name, num in pairs(signal) do
 	if type(name) == "string" and name:sub(1,3) == "SIG" then
-		api[name] = num
+		API[name] = num
 	end
 end
 
@@ -158,7 +162,7 @@ end
      Pipe functions
 --]]
 
-function api.pipe()
+function API.pipe()
 	local inFd, outFd = socket.pipe()
 	
 	--TODO: add write function to input proxy
@@ -172,15 +176,15 @@ end
      Event functions
 --]]
 
-function api.waitEvent(name)
+function API.waitEvent(name)
 	current().script.events:waitOn(name)
 end
 
-function api.triggerEvent(name)
+function API.triggerEvent(name)
 	current().script.events:resumeOn(name)
 end
 
-function api.setEvent(name, on)
+function API.setEvent(name, on)
 	if on == nil then on = true end
 	
 	if on then
@@ -195,9 +199,10 @@ end
 --]]
 
 api.command = {}
+local command = api.command
 
 do 
-	local _ENV = api
+	local _ENV = API
 	
 	function command.up()
 		setEvent("up")
@@ -218,6 +223,6 @@ end
 
 -- access to global environment for debug purposes
 -- (not realistic security risk, as scripts can inherently spawn arbitrary processes)
-api.DEBUG = _G
+API.DEBUG = _G
 
 

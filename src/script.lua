@@ -80,7 +80,7 @@ end
 -- script _ENV metatable
 -- needs to be separate from index table (defined in api.lua) to prevent accessing it via __index
 local env_mt = {}
-env_mt.__index = api -- see api.lua
+env_mt.__index = api.export -- see api.lua
 
 local command_mt = {}
 command_mt.__index = api.command -- see api.lua
