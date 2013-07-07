@@ -95,9 +95,11 @@ function supervise.main()
 		
 		-- setup function to route command results back to client
 		activeThread.reply = function(msg)
-			pcall(socket.sendMessage, fd, msg)
+			local ok, err = pcall(socket.sendMessage, fd, msg)
 			
-			--TODO: report error, even if writing to broken socket harmless?
+			if not ok then
+				print(tostring(err) .. " (fd#" .. fd.fd .. ")")
+			end
 		end
 		
 		if #message < 2 then

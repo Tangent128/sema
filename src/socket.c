@@ -82,7 +82,7 @@ static int grabClientSocket(lua_State *L) {
 	
 	// don't pass socket fd to children unintentionally
 	fcntl(client, F_SETFD, FD_CLOEXEC);
-
+	
 	lua_pushinteger(L, client);
 	return 1;
 }
@@ -151,11 +151,22 @@ static int writeToConnection(lua_State *L) {
 	size_t len;
 	const char *message = luaL_checklstring (L, 2, &len);
 	
+	// make writing nonblocking
+	int oldFlags = fcntl(fd, F_GETFL, 0);
+	fcntl(fd, F_SETFL, O_NONBLOCK);
+	
+	// write data
 	size_t result = write(fd, message, len);
 	
+	// restore state regardless of success or failure
+	fcntl(fd, F_SETFL, oldFlags);
+	
+	// identify some errors
 	if(result == -1) {
 		if(errno == EPIPE) {
 			return luaL_error(L, "Connection closed before message sent.");
+		} else if(errno == EAGAIN || errno == EWOULDBLOCK) {
+			return luaL_error(L, "Pipe/socket full.");
 		}
 		return luaL_error(L, "Unknown socket write error.");
 	}
