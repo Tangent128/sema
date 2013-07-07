@@ -156,9 +156,12 @@ local function readBlock(fd)
 end
 
 --to only be run from a blockable coroutine!
---assumption: only one coroutine is reading at a time
---- (later fix: "buffer" -> "buffers[fd]" w/ bookkeeping in accept/close?
----  & then extract appropriate chunks)
+--[[assumption: only one coroutine is reading a given socket at a time,
+otherwise concurrency issues can happen (ex, what happens if two
+threads see the same header and so deduce the same message length,
+and one of them then removes the message from the buffer?)
+right choice is probably to refactor this logic onto a per-fd reading
+coroutine that receiveMessage() resumes, but the coordination needs design]]
 function socket.receiveMessage(wrappedFd)
 	local fd = wrappedFd.fd
 	
@@ -176,21 +179,20 @@ function socket.receiveMessage(wrappedFd)
 		error "Message was not a sema packet."
 	end
 	
-	local messageLength = socket.readNetworkInt(buffers[fd]:sub(6,9))
+	-- packet length = 9-byte header + payload
+	local packetLength = 9 + socket.readNetworkInt(buffers[fd]:sub(6,9))
 	
-	--discard header and read message body
-	buffers[fd] = buffers[fd]:sub(10)
-	readBytes = #buffers[fd]
-	
-	while readBytes < messageLength do
+	-- read message body too
+	while readBytes < packetLength do
 		local block = readBlock(fd)
 		buffers[fd] = buffers[fd] .. block
 		readBytes = readBytes + #block
 	end
 	
-	--split out the current message while keeping any spare data in the buffer
-	local messageBytes = buffers[fd]:sub(1,messageLength)
-	buffers[fd] = buffers[fd]:sub(messageLength + 1)
+	-- discard header and split out the current message,
+	-- while keeping any spare data in the buffer
+	local messageBytes = buffers[fd]:sub(10,packetLength)
+	buffers[fd] = buffers[fd]:sub(packetLength + 1)
 	
 	--parse message body
 	local message = {}

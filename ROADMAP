@@ -15,6 +15,7 @@ check TODOs
 evade DEBUG usage where possible
 update Lua source version
 test multiple copies of scripts (& different scripts) non-interfering
+test packet concurrency (multiple packets in pipeline for sure, multiple reader threads if time?)
 double check for error conditions/memory leaks/fd leaks
 
 ==== v0.9
