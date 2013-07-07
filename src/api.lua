@@ -162,13 +162,24 @@ end
      Pipe functions
 --]]
 
+local write_mt = {}
+write_mt.__index = write_mt
+
+function write_mt:write(message)
+	local fd = unproxyFd(self)
+	socket.write(fd, message)
+end
+function write_mt:writeln(message)
+	self:write(message .. "\n")
+end
+
 function API.pipe()
-	local inFd, outFd = socket.pipe()
+	local readFd, writeFd = socket.pipe()
 	
 	--TODO: add write function to input proxy
 	return {
-		input = proxyFd(inFd),
-		output = proxyFd(outFd),
+		output = proxyFd(readFd),
+		input = setmetatable(proxyFd(writeFd), write_mt),
 	}
 end
 

@@ -57,7 +57,43 @@ function command.breset()
 	triggerEvent"breset"
 end
 
---DEBUG.print(threadName())
+function command.md5()
+	local p = pipe()
+	local i = p.input
+	local o = p.output
+
+	-- inherently hacky and ill-advised, but
+	-- should work after a GC cycle closes the
+	-- pipe fds in the sema process
+
+	-- [[
+	parallel(function()
+		run {
+			stdin = o,
+			"md5sum"
+		}
+	end)
+	--]]
+
+	parallel(function()
+		run {
+			stdout = i,
+			cmd"echo 1234567"
+		}
+	end)
+end
+
+local catPipe = pipe()
+local cat = parallel(function()
+	run {
+		stdin = catPipe.output,
+		cmd"cat -n"
+	}
+end)
+
+function command.cram(text)
+	catPipe.input:writeln(text)
+end
 
 while running do
 

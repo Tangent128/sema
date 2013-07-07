@@ -140,7 +140,11 @@ function socket.sendMessage(wrappedFd, message)
 	
 	--format message header
 	local header = "sema\x00" .. socket.formatNetworkInt(#body)
-	socket.cWrite(fd, header .. body);
+	socket.cWrite(fd, header .. body)
+end
+
+function socket.write(fd, data)
+	socket.cWrite(fd.fd, data)
 end
 
 local function readBlock(fd)
@@ -221,10 +225,10 @@ end
 -- Functions to make/write-to pipes
 
 function socket.pipe()
-	local inFd, outFd = socket.cPipe()
+	local readFd, writeFd = socket.cPipe()
 	
 	-- does not register polling on fds, as we don't currently read from them
-	return wrapFd(inFd), wrapFd(outFd)
+	return wrapFd(readFd), wrapFd(writeFd)
 end
 
 
