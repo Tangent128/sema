@@ -9,7 +9,15 @@ prettyprint client output
 
 limit server verbosity
 
+quit sema when spawned & no scripts left
+
 ==== beta?
+
+create api.proxy set of metatables
+resolve resources (dofile, chdir, etc) to script location
+
+cmd() takes multiple args
+readNamedPipe()/writeNamedPipe() (can use /dev/null too)
 
 check TODOs
 evade DEBUG usage where possible
