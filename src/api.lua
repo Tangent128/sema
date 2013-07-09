@@ -25,7 +25,7 @@ end
 	General functions
 --]]
 
--- get name of current thread
+-- get name of current script
 function API.scriptName()
 	return current().script.name
 end
@@ -73,6 +73,12 @@ function API.run(tbl, ...)
 			fds[fd] = unproxyFd(tbl[name]).fd
 		end
 	end
+	
+	-- normalize chdir path to script location, if relative
+	--TODO: how to handle directory not changing if user-given path is bad?
+	local _, scriptDir = aux.absPath(current().script.name)
+	tbl.chdir = aux.resolvePath(scriptDir, tbl.chdir or "")
+	
 	
 	-- fd mapping is handled Lua-side for simplification
 	-- this is called post-fork, in the child

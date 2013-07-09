@@ -15,8 +15,8 @@ function aux.absPath(path)
 	local dir, name = path:match("^(.-/?)([^/]-)$")
 	
 	if #dir == 0 then
-		--TODO: do we want to use some default directory
-		-- in these cases besides cwd?
+		--TODO: we presumably want to use some default directory
+		-- in these cases besides cwd
 		dir = "./"
 	end
 		
@@ -27,6 +27,14 @@ function aux.absPath(path)
 	path = dir .. name
 	
 	return path, dir
+end
+
+function aux.resolvePath(base, path)
+	if path:match("^/") then
+		return path
+	end
+	
+	return base .. "/" .. path
 end
 
 -- code for shutting down cleanly

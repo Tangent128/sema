@@ -73,25 +73,15 @@ static int run(lua_State *L) {
 	lua_pop(L, 1);
 	
 	// traverse fdMap table & map fds
-	// TODO: actually map fds (& maybe delegate to lua code, kinda hairy...)
-	/*lua_getfield(L, 1, "fdMap");
-	int numFds = lua_rawlen(L, -1);
-	for(i = 1; i <= numFds; i++) {
-		lua_pushinteger(L, i);
-		lua_gettable(L, -2);
-
-		int fd = lua_tointeger(L, -1);
-		lua_pop(L, 1);
-		
-		// clear close-on-execute status
-		fcntl(fd, F_SETFD, 0);
-		//printf("sticking fs %d\n", fd);
-		
-	}
-	lua_pop(L, 1);*/
-	
 	lua_getfield(L, 1, "fdMapper");
 	lua_call(L, 0, 0);
+	
+	// change working directory
+	lua_getfield(L, 1, "chdir");
+	const char * workingDir = lua_tostring(L, -1);
+	chdir(workingDir);
+	lua_pop(L, 1);
+	
 	
 	// prepare to exec the child process
 	

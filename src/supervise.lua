@@ -10,7 +10,7 @@ local function grabScript(name, startDown)
 		return scriptMap[name]
 	end
 	
-	local newScript = script.makeScript()
+	local newScript = script.makeScript(name)
 	
 	local func, err = loadfile(name, "bt", newScript.env)
 

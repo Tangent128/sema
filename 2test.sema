@@ -95,6 +95,10 @@ function command.cram(text)
 	catPipe.input:writeln(text)
 end
 
+function command.name()
+	reply(scriptName())
+end
+
 while running do
 
 runIfUp{
