@@ -6,7 +6,7 @@ api.export = {}
 local API = api.export
 
 --[[
-	Script-side API functions
+	Utility functions
 --]]
 
 local current = queue.getActive
@@ -19,6 +19,11 @@ end
 
 local function unproxyFd(proxy)
 	return current().script.fds[proxy]
+end
+
+local function resolve(path)
+	local _, scriptDir = aux.absPath(current().script.name)
+	return aux.resolvePath(scriptDir, path)
 end
 
 --[[
@@ -76,8 +81,7 @@ function API.run(tbl, ...)
 	
 	-- normalize chdir path to script location, if relative
 	--TODO: how to handle directory not changing if user-given path is bad?
-	local _, scriptDir = aux.absPath(current().script.name)
-	tbl.chdir = aux.resolvePath(scriptDir, tbl.chdir or "")
+	tbl.chdir = resolve(tbl.chdir or "")
 	
 	
 	-- fd mapping is handled Lua-side for simplification
@@ -182,7 +186,6 @@ end
 function API.pipe()
 	local readFd, writeFd = socket.pipe()
 	
-	--TODO: add write function to input proxy
 	return {
 		output = proxyFd(readFd),
 		input = setmetatable(proxyFd(writeFd), write_mt),
@@ -231,10 +234,10 @@ do
 	end
 	
 	function command.status()
-		reply {
+		reply (
 			"OK",
 			"Script loaded."
-		}
+		)
 	end
 end
 

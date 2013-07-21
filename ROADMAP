@@ -2,22 +2,23 @@ TODO:
 
 ==== alpha?
 
-script loading
+quit sema when in spawned mode & no scripts left
+
+create api.proxy set of metatables
+cmd() takes multiple args
 
 usage help + README
-prettyprint client output
-
-limit server verbosity
-
-quit sema when spawned & no scripts left
 
 ==== beta?
 
-create api.proxy set of metatables
-resolve resources (dofile, chdir, etc) to script location
+don't killall script when main thread exits
 
-cmd() takes multiple args
-readNamedPipe()/writeNamedPipe() (can use /dev/null too)
+script loading
+resolve resources (dofile, chdir, etc) to script location
+ensureFifo() / openRead() / openWrite()
+
+prettyprint client output
+limit server verbosity
 
 check TODOs
 evade DEBUG usage where possible
@@ -28,8 +29,9 @@ double check for error conditions/memory leaks/fd leaks
 
 ==== v0.9
 
+env + "named" fds
+"use"
 wait for given time
-use
 
 ==== v1.0
 
