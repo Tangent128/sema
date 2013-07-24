@@ -20,6 +20,7 @@ end
 
 -- Functions to establish sockets
 
+-- helper to consult an environment variable
 local function tryVar(name, suffix)
 	local value = os.getenv(name)
 	if value then
@@ -29,6 +30,7 @@ local function tryVar(name, suffix)
 	end
 end
 
+-- decide where we want our socket
 local socketPath = nil
 function socket.getSocketPath()
 	if socketPath then
@@ -50,6 +52,8 @@ function socket.getSocketPath()
 	return socketPath
 end
 
+-- connect to server if possible,
+-- nil means stale socket or no socket, with a second return giving the error
 local clientFd = nil
 function socket.grabClientSocket()
 
@@ -57,18 +61,20 @@ function socket.grabClientSocket()
 		return clientFd
 	end
 
-	clientFd = wrapFd(socket.cGrabClientSocket(socket.getSocketPath()))
+	local fdNum, err = socket.cGrabClientSocket(socket.getSocketPath())
+
+	clientFd = wrapFd(fdNum)
 
 	if clientFd then
 		poll.addFd(clientFd.fd, "read")
 		socket.buffers[clientFd.fd] = ""
 	end
 
-	return clientFd
+	return clientFd, err
 end
 
 local serverFd = nil
-function socket.grabServerSocket()
+function socket.grabServerSocketSimple()
 
 	if serverFd then
 		return serverFd
@@ -83,6 +89,29 @@ function socket.grabServerSocket()
 	end
 
 	return serverFd
+end
+function socket.grabServerSocket()
+
+	local ok, serverFd = pcall(socket.grabServerSocketSimple)
+	
+	if ok then
+		return serverFd
+	end
+	
+	-- check for stale socket or in-use socket
+	local clientSocket, err = socket.grabClientSocket()
+	
+	if clientSocket then
+		error "Socket already in use."
+	end
+	
+	if err == "ECONNREFUSED" then
+		--grabClientSocket() would hopefully have cleared out the stale socket
+		return socket.grabServerSocketSimple()
+	end
+	
+	-- unknown error, propagate initial error
+	error(serverFd)
 end
 
 --incompletely-received data

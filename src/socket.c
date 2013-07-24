@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <arpa/inet.h>
 #include <sys/un.h>
 #include <stdint.h>
@@ -70,9 +71,28 @@ static int grabClientSocket(lua_State *L) {
 	
 	errno = 0;
 	int result = connect(client, (struct sockaddr*) &addr, sizeof(addr));
-	if(errno == ECONNREFUSED || errno == ENOENT) {
+	if(errno == ECONNREFUSED) {
+		// try to clean up stale socket so a new server can be spawned
+		struct stat fileInfo;
+		stat(path, &fileInfo);
+		
+		if(S_ISSOCK(fileInfo.st_mode)) {
+			// the path actually is a socket,
+			// and thus safe to attempt deleting
+			unlink(path);
+		} else {
+			return luaL_error(L, "Chosen socket path was not a socket.");
+		}
+		
+		// report cause of error
 		lua_pushnil(L);
-		return 1;
+		lua_pushstring(L, "ECONNREFUSED");
+		return 2;
+	}
+	if(errno == ENOENT) {
+		lua_pushnil(L);
+		lua_pushstring(L, "ENOENT");
+		return 2;
 	}
 	if(result == -1) {
 		perror("connect");

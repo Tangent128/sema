@@ -2,6 +2,7 @@ TODO:
 
 ==== alpha?
 
+detect+remove stale socket
 quit sema when in spawned mode & no scripts left
 
 create api.proxy set of metatables
@@ -13,12 +14,12 @@ usage help + README
 
 don't killall script when main thread exits
 
-script loading
-resolve resources (dofile, chdir, etc) to script location
+script loading / dofile
+resolve resources (dofile, chdir, etc) to script location, gracefully handle bad paths
 ensureFifo() / openRead() / openWrite()
 
 prettyprint client output
-limit server verbosity
+limit server verbosity / consolidate error reporting (not perror + Lua error clutter)
 
 check TODOs
 evade DEBUG usage where possible
@@ -35,9 +36,10 @@ wait for given time
 
 ==== v1.0
 
-resolve file names to socket path (more realpathness + common prefix?)
+resolve file names relative to socket path? (more realpathness + common prefix?)
 socket activation?
 writes should block coroutines on full pipe
+allow scripts to specify the socket they expect to run on (to ensure only one copy)
 inotify?
 metrics?
 
