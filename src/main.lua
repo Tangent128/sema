@@ -10,6 +10,8 @@ xpcall(function(...)
 local args = { select(2, ... ) } -- trim off argv[0]
 
 local mode = "spawn"
+autoSpawned = false
+
 -- spawn = run as client, but spawn server process to talk to if needed
 -- server = run as server, managing daemon-supervising coroutines
 -- client = run as client, sending command to server
@@ -57,6 +59,8 @@ poll.addFd(signalFd, "signal")
 
 -- fork if need be
 if mode == "spawn" then
+	
+	autoSpawned = true
 	
 	if socket.grabClientSocket() then
 		mode = "client"

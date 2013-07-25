@@ -2,6 +2,19 @@
 supervise = {}
 
 local scriptMap = {}
+local connectionSet = setmetatable({}, aux.weak_k_mt)
+
+local function checkAutoquit()
+	-- exit supervisor if spawned and script + connection count dropped to zero
+	if autoSpawned
+	and not next(scriptMap)
+	and not next(connectionSet)
+	then
+		aux.shutdown()
+	else
+		print(autoSpawned, next(scriptMap), next(connectionSet), 3)
+	end
+end
 
 local COMMAND_THREAD = {}
 local function grabScript(name, startDown)
@@ -36,6 +49,8 @@ local function grabScript(name, startDown)
 		end, name)
 		
 		-- make kill of main thread do cleanup
+		-- TODO eventually: "liveThreads" counter on script,
+		-- when at zero, call script's kill function, which will be set here
 		local baseKill = mainThread.kill
 		function mainThread:kill()
 			-- default behavior
@@ -47,6 +62,8 @@ local function grabScript(name, startDown)
 			
 			-- cleanup script
 			scriptMap[name] = nil
+			
+			checkAutoquit()
 			
 		end
 		
@@ -188,17 +205,25 @@ function supervise.main()
 		while true do
 			local accepted = socket.accept(serverFd)
 			
+			connectionSet[accepted] = true
+			
 			-- create thread to handle this connection
 			queue.enqueue(supervisor:makeThread(function()
 			
 				local ok, err = pcall(connectionHandler, accepted)
+				connectionSet[accepted] = nil
 				
 				if err then
 					socket.sendMessage(accepted, {
 						"ERROR",
 						tostring(err)
 					})
-					
+				end
+				
+				checkAutoquit()
+				
+				if err then
+					--TODO: sanify error handling/logging so that this error won't be missed on autoclose?
 					-- pass error up chain for server-side reporting too
 					error(err)
 				end
