@@ -10,27 +10,29 @@ xpcall(function(...)
 local programName = (...) -- argv[0]
 local function printHelp()
 	local text = [=[
-Lua-scripted centralized daemon supervisor. Usage:
+Lua-scripted centralized daemon supervisor.
+
+Usage:
 
 $sema --server
-	Launch a foreground server process, which will receive commands
+	Launch a foreground server process, it can receive commands
 	from future clients.
 
-$sema --client scriptFile.sema [command [command args...]]
-	Connect to the server and ensure a given script is running.
-	Optionally send a command to the script.
+$sema --client scriptFile.sema [command [args...]]
+	Connect to the server and ensure the script 'scriptFile.sema'
+	is running; optionally send command and arguments to the script.
 
-$sema scriptFile.sema [command [command args...]]
+$sema scriptFile.sema [command [args...]]
 	Like --client, but automatically spawn a background server if
 	a server is not yet running.
 
 $sema --ls
-	List server's currently loaded scripts, and PIDs of any daemons.
+	List the server's currently loaded scripts, and PIDs of any daemons.
 	
 $sema --kill scriptFile.sema
 	Force-quit a script on the server and SIGKILL its daemons.
 
-Default control socket location is based on current user,
+Location of default control socket is based on current user,
 $SEMA_SOCKET may be set to provide an explicit control socket to use.
 ]=]
 	text = text:gsub("$sema", programName)
