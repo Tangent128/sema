@@ -33,6 +33,8 @@ env + "named" fds
 "use"
 wait for given time
 
+add default "quit" (or maybe "shutdown"?) command
+
 ==== v1.0
 
 resolve file names relative to socket path? (more realpathness + common prefix?)
