@@ -127,12 +127,15 @@ function API.runIfUp(...)
 	return API.run(...)
 end
 
--- split a simple command line string for a run{} command
+-- split a *simple* command line string for a run{} command
 -- does nothing about quotes, envvars, etc, just splits on whitespace
-function API.cmd(cmdline)
+function API.cmd(...)
 	local words = {}
-	for word in cmdline:gmatch("[^%s]+") do
-		words[#words + 1] = word
+	local strings = {...}
+	for i = 1, #strings do
+		for word in strings[i]:gmatch("[^%s]+") do
+			words[#words + 1] = word
+		end
 	end
 	return table.unpack(words)
 end
