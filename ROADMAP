@@ -7,6 +7,8 @@ cmd() takes multiple args
 
 usage help + README
 
+update Lua source version
+
 ==== beta?
 
 don't killall script when main thread exits
@@ -21,7 +23,6 @@ limit server verbosity / consolidate error reporting (not perror + Lua error clu
 
 check TODOs
 evade DEBUG usage where possible
-update Lua source version
 test multiple copies of scripts (& different scripts) non-interfering
 test packet concurrency (multiple packets in pipeline for sure, multiple reader threads if time?)
 double check for error conditions/memory leaks/fd leaks

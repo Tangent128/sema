@@ -202,7 +202,7 @@ function supervise.main()
 	
 	-- top-level loop for processing client connections
 	local function acceptLoop()
-		print "server awaiting connections"
+		--print "server awaiting connections"
 		while true do
 			local accepted = socket.accept(serverFd)
 			
