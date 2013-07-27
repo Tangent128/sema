@@ -2,8 +2,6 @@ TODO:
 
 ==== alpha?
 
-fix autospawn- don't autoquit if PID 1
-
 create api.proxy set of metatables
 cmd() takes multiple args
 
@@ -12,7 +10,7 @@ usage help + README
 ==== beta?
 
 don't killall script when main thread exits
-script killall notifies connected clients w/ error
+script killall notifies connected clients w/ error, removes connections from can't-autoquit list
 
 script loading / dofile
 resolve resources (dofile, chdir, etc) to script location, gracefully handle bad paths

@@ -10,9 +10,10 @@ local function checkAutoquit()
 	and not next(scriptMap)
 	and not next(connectionSet)
 	then
+		--print("autoquiting", autoSpawned, next(scriptMap), next(connectionSet))
 		aux.shutdown()
 	else
-		print(autoSpawned, next(scriptMap), next(connectionSet), 3)
+		--print("not autoquiting", autoSpawned, next(scriptMap), next(connectionSet))
 	end
 end
 
@@ -81,7 +82,7 @@ end
 
 function supervise.main()
 	do 
-		print "start server"
+		--print "start server"
 	end
 	
 	local serverFd = socket.grabServerSocket()

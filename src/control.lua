@@ -2,7 +2,7 @@
 control = {}
 
 function control.main(action, ...)
-	print "start client"
+	--print "start client"
 	
 	-- connect to server
 	local clientFd = socket.grabClientSocket()
