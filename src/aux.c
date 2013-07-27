@@ -17,24 +17,29 @@ static int modeFork(lua_State *L) {
 	
 	// normally, the forked child process becomes the server,
 	// so as to disappear from the shell
-	int isServer = (result == 0);
+	int isChild = (result == 0);
+	int isServer = isChild;
 	
 	// reverse this for PID 1, so that init doesn't exit
 	if(getpid() == 1) {
-		isServer = !isServer;
+		isServer = !isChild;
 	}
 
-	// return	
-	if(isServer) { // Child
+	// return server/client, parent/child 
+	
+	if(isServer) {
 		lua_pushstring(L, "server");
-		return 1;
-		
-	} else { // Parent
+	} else {
 		lua_pushstring(L, "client");
-		return 1;
-		
 	}
 	
+	if(isChild) {
+		lua_pushstring(L, "child");
+	} else {
+		lua_pushstring(L, "parent");
+	}
+	
+	return 2;
 }
 
 

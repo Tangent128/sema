@@ -60,14 +60,23 @@ poll.addFd(signalFd, "signal")
 -- fork if need be
 if mode == "spawn" then
 	
-	autoSpawned = true
-	
 	if socket.grabClientSocket() then
+		-- server running, fork uneeded
 		mode = "client"
 	else
-		-- get server socket ready
+		-- need to fork to create server
+		
+		-- get server socket ready pre-fork to avoid 
 		socket.grabServerSocket()
-		mode = aux.modeFork()
+		
+		local process
+		mode, process = aux.modeFork()
+		
+		-- when the server is the child (normal case, unless PID == 1),
+		-- allow it to autoquit when all scripts are quit
+		if process == "child" then
+			autoSpawned = true
+		end
 	end
 end
 
