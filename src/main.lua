@@ -15,7 +15,7 @@ Lua-scripted centralized daemon supervisor.
 Usage:
 
 $sema --server
-	Launch a foreground server process, it can receive commands
+	Launch a foreground server process, which can receive commands
 	from future clients.
 
 $sema --client scriptFile.sema [command [args...]]
@@ -32,9 +32,8 @@ $sema --ls
 $sema --kill scriptFile.sema
 	Force-quit a script on the server and SIGKILL its daemons.
 
-Location of default control socket is based on current user,
-$SEMA_SOCKET may be set to provide an explicit control socket to use.
-]=]
+Location of default control socket is based on the current user;
+$SEMA_SOCKET may be set to provide an explicit control socket to use.]=]
 	text = text:gsub("$sema", programName)
 	print(text)
 end
