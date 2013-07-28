@@ -1,4 +1,7 @@
-#http://lua-users.org/lists/lua-l/2008-11/msg00453.html
+--[[
+Author: Mildred Ki'Lya
+http://lua-users.org/lists/lua-l/2008-11/msg00453.html
+--]]
 
 local name, static = ...
 

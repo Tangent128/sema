@@ -3,8 +3,9 @@ TODO:
 ==== alpha?
 
 create api.proxy set of metatables
+fullpath
 
-README
+README / COPYRIGHT / SCRIPTING
 
 update Lua source version
 
