@@ -96,9 +96,8 @@ function script.makeEnv()
 	local env = setmetatable({
 	}, env_mt)
 	
-	env.command = setmetatable({}, command_mt)
-	
 	-- import sandboxed standard library tables
+	-- and default command implementations
 	for name in pairs(proxy_mts) do
 		env[name] = setmetatable({}, proxy_mts[name])
 	end

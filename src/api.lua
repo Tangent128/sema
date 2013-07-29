@@ -218,11 +218,30 @@ function API.setEvent(name, on)
 end
 
 --[[
+	Import some standard libs
+--]]
+api.proxy = {}
+
+local function importFuncs(toTable, src, names)
+	for i = 1,#names do
+		local name = names[i]
+		toTable[name] = src[name]
+	end
+	return toTable
+end
+
+importFuncs(api.export, _G, {
+	"assert", "error", "ipairs", "next", "pairs", "pcall", "select",
+	"setmetatable", "tonumber", "tostring", "type", "_VERSION"})
+api.proxy.table = importFuncs({}, table, {
+	"concat", "insert", "pack", "remove", "sort", "unpack"})
+
+--[[
      Default implementation for default commands
 --]]
 
-api.command = {}
-local command = api.command
+api.proxy.command = {}
+local command = api.proxy.command
 
 do 
 	local _ENV = API
@@ -243,25 +262,6 @@ do
 		)
 	end
 end
-
---[[
-	Import some standard libs
---]]
-api.proxy = {}
-
-local function importFuncs(toTable, src, names)
-	for i = 1,#names do
-		local name = names[i]
-		toTable[name] = src[name]
-	end
-	return toTable
-end
-
-importFuncs(api.export, _G, {
-	"assert", "error", "ipairs", "next", "pairs", "pcall", "select",
-	"setmetatable", "tonumber", "tostring", "type", "_VERSION"})
-api.proxy.table = importFuncs({}, table, {
-	"concat", "insert", "pack", "remove", "sort", "unpack"})
 
 -- access to global environment for debug purposes
 -- (not realistic security risk, as scripts can inherently spawn arbitrary processes, but best avoided in production)
