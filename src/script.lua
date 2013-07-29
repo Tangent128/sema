@@ -85,10 +85,24 @@ env_mt.__index = api.export -- see api.lua
 local command_mt = {}
 command_mt.__index = api.command -- see api.lua
 
+local proxy_mts = {}
+for name in pairs(api.proxy) do
+	local proxy_mt = {}
+	proxy_mt.__index = api.proxy[name]
+	proxy_mts[name] = proxy_mt
+end
+
 function script.makeEnv()
 	local env = setmetatable({
 	}, env_mt)
+	
 	env.command = setmetatable({}, command_mt)
+	
+	-- import sandboxed standard library tables
+	for name in pairs(proxy_mts) do
+		env[name] = setmetatable({}, proxy_mts[name])
+	end
+	
 	return env
 end
 

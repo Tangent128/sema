@@ -244,8 +244,27 @@ do
 	end
 end
 
+--[[
+	Import some standard libs
+--]]
+api.proxy = {}
+
+local function importFuncs(toTable, src, names)
+	for i = 1,#names do
+		local name = names[i]
+		toTable[name] = src[name]
+	end
+	return toTable
+end
+
+importFuncs(api.export, _G, {
+	"assert", "error", "ipairs", "next", "pairs", "pcall", "select",
+	"setmetatable", "tonumber", "tostring", "type", "_VERSION"})
+api.proxy.table = importFuncs({}, table, {
+	"concat", "insert", "pack", "remove", "sort", "unpack"})
+
 -- access to global environment for debug purposes
--- (not realistic security risk, as scripts can inherently spawn arbitrary processes)
+-- (not realistic security risk, as scripts can inherently spawn arbitrary processes, but best avoided in production)
 API.DEBUG = _G
 
 
