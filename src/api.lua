@@ -35,6 +35,9 @@ function API.scriptName()
 	return current().script.name
 end
 
+-- resolve a path relative to current script
+API.fullpath = resolve
+
 -- send a message back to the client that spawned this command
 -- (only works from a command handler)
 function API.reply(...)
