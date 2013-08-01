@@ -4,6 +4,13 @@ local close
 
 -- metatable to allow garbage-collecting file descriptors
 local fd_mt = {
+	__index = {
+		close = function(wrapper)
+			close(wrapper.fd)
+			wrapper.fd = nil
+			--print("Manually closed "..wrapper.fd)
+		end
+	},
 	__gc = function(wrapper)
 		close(wrapper.fd)
 		--print("GC: closed "..wrapper.fd)
@@ -134,9 +141,11 @@ end
 
 -- close function, works for both sockets and pipes
 function close(fd)
-	poll.dropFd(fd)
-	socket.buffers[fd] = nil
-	socket.cClose(fd)
+	if fd then
+		poll.dropFd(fd)
+		socket.buffers[fd] = nil
+		socket.cClose(fd)
+	end
 end
 
 -- message = list of strings, {"like", "this", "..."}
@@ -241,7 +250,7 @@ end
 
 -- prevent client from deleting a socket it created when spawning a server
 function socket.detachServer()
-	serverFd = nil --no leak, will trigger GC
+	serverFd = nil --no leak, will trigger GC eventually
 end
 
 -- on exit, clean up socket

@@ -229,7 +229,10 @@ function supervise.main()
 					error(err)
 				end
 				
-				--"accepted" socket will be GC'd
+				--"accepted" socket will be GC'd, but that can be slow;
+				-- free up resouces manually
+				accepted:close()
+				
 				--print("done with fd "..accepted.fd)
 				
 			end))
