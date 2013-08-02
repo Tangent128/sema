@@ -1,17 +1,15 @@
 TODO:
 
-==== alpha?
+==== now
 
 README / COPYRIGHT / SCRIPTING
-
-update Lua source version
 
 ==== beta?
 
 don't killall script when main thread exits
 script killall notifies connected clients w/ error, removes connections from can't-autoquit list
 
-script loading / dofile
+script [re]loading / dofile
 resolve resources (dofile, chdir, etc) to script location, gracefully handle bad paths
 ensureFifo() / openRead() / openWrite()
 
@@ -19,7 +17,6 @@ prettyprint client output
 limit server verbosity / consolidate error reporting (not perror + Lua error clutter)
 
 check TODOs
-evade DEBUG usage where possible
 test multiple copies of scripts (& different scripts) non-interfering
 test packet concurrency (multiple packets in pipeline for sure, multiple reader threads if time?)
 double check for error conditions/memory leaks/fd leaks
