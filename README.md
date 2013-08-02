@@ -22,7 +22,7 @@ Building
 `sema` uses the [Redo] build system; however, installing `redo` is not necessary, as a minimal always-rebuilds implementation is included under `src/do.sh`.
 [Redo]: https://github.com/apenwarr/redo
 
-Building the embedded Lua interpreter requires the standard `make` utility.
+Building requires a libc and your distribution's basic build tools. (ie, 'build-essential' on Debian)
 
 From the root of the repository, run:
 
@@ -90,7 +90,7 @@ while true do
 end
 ```
 
-For fuller documentation of the script API, see `SCRIPTING` and the files under `example/`
+For fuller documentation of the script API, see `SCRIPTING.md` and the files under `example/`
 
 
 Environment

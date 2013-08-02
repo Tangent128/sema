@@ -34,7 +34,6 @@ $sema --kill scriptFile.sema
 
 Location of default control socket is based on the current user;
 $SEMA_SOCKET may be set to provide an explicit control socket to use.
-
 ]=]
 	text = text:gsub("$sema", programName)
 	print(text)
