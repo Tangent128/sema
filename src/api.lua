@@ -226,6 +226,7 @@ end
 api.proxy = {}
 
 local function importFuncs(toTable, src, names)
+	-- copy selected pairs to table
 	for i = 1,#names do
 		local name = names[i]
 		toTable[name] = src[name]
@@ -238,6 +239,9 @@ importFuncs(api.export, _G, {
 	"setmetatable", "tonumber", "tostring", "type", "_VERSION"})
 api.proxy.table = importFuncs({}, table, {
 	"concat", "insert", "pack", "remove", "sort", "unpack"})
+api.proxy.string = string
+api.proxy.math = math
+api.proxy.bit32 = bit32
 
 --[[
      Default implementation for default commands
@@ -267,7 +271,7 @@ do
 end
 
 -- access to global environment for debug purposes
--- (not realistic security risk, as scripts can inherently spawn arbitrary processes, but best avoided in production)
+-- (best avoided in production)
 API.DEBUG = _G
 
 
