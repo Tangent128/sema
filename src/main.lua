@@ -75,6 +75,8 @@ if args[1] and args[1]:match "^[-][-]" then
 	elseif args[1] == "--debug" then
 		mode = "client"
 		action = "debug"
+	elseif args[1] == "--help" then
+		mode = "help"
 	else
 		print("Unknown command: " .. args[1])
 		mode = "help"
