@@ -19,7 +19,10 @@ limit server verbosity / consolidate error reporting (not perror + Lua error clu
 check TODOs
 test multiple copies of scripts (& different scripts) non-interfering
 test packet concurrency (multiple packets in pipeline for sure, multiple reader threads if time?)
+test whether or not startDown is redundant
 double check for error conditions/memory leaks/fd leaks
+
+add version to --help
 
 ==== v0.9
 
