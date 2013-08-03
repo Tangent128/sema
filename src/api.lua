@@ -237,8 +237,7 @@ end
 importFuncs(api.export, _G, {
 	"assert", "error", "ipairs", "next", "pairs", "pcall", "select",
 	"setmetatable", "tonumber", "tostring", "type", "_VERSION"})
-api.proxy.table = importFuncs({}, table, {
-	"concat", "insert", "pack", "remove", "sort", "unpack"})
+api.proxy.table = table
 api.proxy.string = string
 api.proxy.math = math
 api.proxy.bit32 = bit32
