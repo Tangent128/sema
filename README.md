@@ -108,5 +108,5 @@ License
 
 `sema` is MIT-licensed, like Lua.
 
-For the full license read `COPYRIGHT`.
+For the full license read `COPYRIGHT.md`.
 
