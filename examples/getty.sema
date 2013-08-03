@@ -1,0 +1,35 @@
+#!/bin/env sema
+
+-- example sema script for supervising multiple getty processes
+
+-- "factory" thread spawner
+function tty(num) parallel(function()
+	while true do
+	
+		-- default "up" and "down" commands will
+		-- enable/disable respawn on all ttys
+		runIfUp {
+			-- different systems use different getty programs.
+			-- adjust as necessary
+			"/sbin/agetty", "-8", "-s", "38400", num, "linux"
+		}
+	end
+end) end
+
+
+-- note: before trying this, make sure you disable whatever
+-- method your system uses to respawn gettys; for safety,
+-- I advise leaving a few ttys managed by the native system
+
+--tty "tty1"
+--tty "tty2"
+tty "tty3"
+tty "tty4"
+tty "tty5"
+tty "tty6"
+
+
+-- beta version of sema kills everything on main thread exit,
+-- make main thread sleep forever to workaround
+waitEvent "n/a"
+

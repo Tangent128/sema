@@ -1,0 +1,70 @@
+#!/usr/local/bin/sema
+
+-- example sema script for supervising & logging a Minecraft server
+
+
+-- create two pipes
+controlPipe = controlPipe or pipe()
+logPipe = logPipe or pipe()
+
+-- supervise a daemontools-style logger
+function logger()
+	
+	-- a custom command could unset this
+	-- event to stop respawning the logger
+	waitEvent "logging"
+	
+	run {
+		stdin = logPipe.output,
+		-- replace with your desired logger
+		cmd "svlogd log/"
+	}
+	
+	-- tail calls are preferable, to support
+	-- hotswapping this function when a future
+	-- sema version allows live-reloading scripts
+	return logger()
+end
+loggerThread = loggerThread or parallel(logger)
+
+-- affirm we want the logger up
+setEvent "logging"
+
+-- supervise the game server
+function minecraft()
+
+	-- automatically waits for the "up"
+	-- event, which starts set to on
+	runIfUp{
+		-- route I/O
+		stdin = controlPipe.output,
+		stdout = logPipe.input,
+		stderr = logPipe.input,
+		
+		-- assuming minecraft.jar and this script are in the world directory
+		cmd("java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui")
+	}
+
+	return minecraft()
+end
+minecraftThread = minecraftThread or parallel(minecraft)
+
+-- custom command for injecting commands
+-- to the Minecraft server's stdin
+function command.cmd(cmdline)
+	controlPipe.input:writeln(cmdline)
+end
+
+-- custom implementation of "down", with a politer shutdown than a signal
+function command.down()
+	-- 
+	setEvent("up", false)
+	
+	-- cleanly stop Minecraft
+	command.cmd "stop"
+end
+
+-- beta version of sema kills everything on main thread exit,
+-- make main thread sleep forever to workaround
+waitEvent "n/a"
+
