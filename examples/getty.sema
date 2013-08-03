@@ -1,4 +1,4 @@
-#!/bin/env sema
+#!/usr/bin/env sema
 
 -- example sema script for supervising multiple getty processes
 
