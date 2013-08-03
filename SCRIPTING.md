@@ -1,7 +1,9 @@
 Sema Scripting Reference
 ========================
 
-Sema is controlled by Lua scripts; indeed, architecture-wise, it is little more than a Lua script server. Each script gets its own independent global environment.
+Sema is controlled by Lua scripts; indeed, architecture-wise, it is 
+little more than a Lua script server. Each script gets its own independent 
+global environment.
 
 Scripts are identified by their absolute filepaths, and sema will only load one copy of a script at a time. Symlinks are *not* followed, and so multiple symlinks to the same script are considered as separate instances and can be run in parallel. (this behavior *may* change in the future)
 
