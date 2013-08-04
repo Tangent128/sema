@@ -16,28 +16,6 @@ The project's git repository and bug tracker may be found at
 https://github.com/Tangent128/sema
   
 
-Building
---------
-
-`sema` uses the [Redo] build system; however, installing `redo` is not necessary, as a minimal always-rebuilds implementation is included under `src/do.sh`.
-[Redo]: https://github.com/apenwarr/redo
-
-Building requires a libc and your distribution's basic build tools. (ie, 'build-essential' on Debian)
-
-From the root of the repository, run:
-
-`src/do.sh sema`
-
-or
-
-`redo sema`
-
-as appropriate; the resulting "sema" executable may be installed where desired.
-
-If not using GCC: CC & LD variables may be set in a file named `config`, with standard shell syntax.
-
-To use a distribution copy of Lua 5.2 instead of the bundled source, add a `useInstalledLua` statement to the `config` file.
-
 Usage
 -----
 
@@ -103,6 +81,29 @@ The control socket for the client and server to use may be specified by the $SEM
 Otherwise, the default socket location depends on the current user; if running as root, then `/run/sema.socket` will be used.
 
 If running as an ordinary user, `$XDG_RUNTIME_DIR/sema.socket` and `$HOME/.sema.socket` will be tried, in that order.
+
+
+Building
+--------
+
+`sema` uses the [Redo] build system; however, installing `redo` is not necessary, as a minimal always-rebuilds implementation is included under `src/do.sh`.
+[Redo]: https://github.com/apenwarr/redo
+
+Building requires a libc and your distribution's basic build tools. (ie, 'build-essential' on Debian)
+
+From the root of the repository, run:
+
+`src/do.sh sema`
+
+or
+
+`redo sema`
+
+as appropriate; the resulting "sema" executable may be installed where desired.
+
+If not using GCC: CC & LD variables may be set in a file named `config`, with standard shell syntax.
+
+To use a distribution version of Lua 5.2 instead of the bundled source, add a `useInstalledLua` statement to the `config` file.
 
 
 License
