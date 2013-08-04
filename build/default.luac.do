@@ -1,9 +1,5 @@
 
-LUAC=../liblua/luac
+. ../config.base
 
-src=../src/$2.lua
-
-redo-ifchange $LUAC $src
-
-$LUAC -o $3 $src
+compileLua $ROOT/src/$2.lua
 

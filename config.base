@@ -2,12 +2,25 @@
 # Initial configuration; variables like CC & LD
 # may be overriden in the generated ./config file
 
+# determine root of project
+ROOT=.
+while test ! -e $ROOT/config.base ; do
+	ROOT="$ROOT/.."
+done
+ROOT=$(cd $ROOT ; pwd)
+
+# establish dependencies
+redo-ifchange $ROOT/config.base $ROOT/config
+
 # C compiler command
 CC="gcc -Wall -c"
 
 # linker command
 LD="gcc -Wall"
 
+# lua/luac commands
+LUA=../liblua/lua
+LUAC="$ROOT/liblua/luac"
 
 # Libpath-related C flags
 LIBS="-llua -lm"
@@ -17,10 +30,30 @@ LUADEP_INC="../liblua/lua.h ../liblua/lualib.h ../liblua/lauxlib.h ../liblua/lua
 LUADEP_LIB="liblua/liblua.a"
 LUAINC="-I../liblua"
 LUALIB="-Lliblua"
+LUADEP="$LUA"
+LUACDEP="$LUAC"
+
+# handy command ./config can run to clear dependency/use of included lua
+useInstalledLua() {
+	LUADEP_INC=
+	LUADEP_LIB=
+	LUAINC=
+	LUALIB=
+	LUADEP=
+	LUACDEP=
+	LUA=lua
+	LUAC=luac
+}
 
 # utility functions, likely no need to edit
 OUTFILE=$3
-compile() {
+
+compileLua() {
+	redo-ifchange $LUACDEP $1
+	$LUAC -o $OUTFILE $1
+}
+
+compileC() {
 	redo-ifchange $LUADEP_INC $*
 	$CC $LUAINC $* -o $OUTFILE
 }
@@ -29,3 +62,8 @@ link() {
 	redo-ifchange $LUADEP_LIB $*
 	$LD $LUALIB $* $LIBS -o $OUTFILE
 }
+
+# load custom config
+
+. $ROOT/config
+

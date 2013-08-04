@@ -1,9 +1,9 @@
 
-LUA=../liblua/lua
+. ../config.base
 
 src=$2.luac
 
-redo-ifchange $LUA $src
+redo-ifchange $LUADEP $src
 
-$LUA ../src/bin2c.lua res_$2_luac < $src > $3
+$LUA $ROOT/src/bin2c.lua res_$2_luac < $src > $3
 

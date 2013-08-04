@@ -1,4 +1,6 @@
 
-rm -f hello sema
+rm -f sema
 
-redo liblua/clean build/clean
+test -e liblua/clean.do && redo liblua/clean
+test -e build/clean.do && redo build/clean
+
