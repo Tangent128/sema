@@ -36,6 +36,8 @@ as appropriate; the resulting "sema" executable may be installed where desired.
 
 If not using GCC: CC & LD variables may be set in a file named `config`, with standard shell syntax.
 
+To use a distribution copy of Lua 5.2 instead of the bundled source, add a `useInstalledLua` statement to the `config` file.
+
 Usage
 -----
 
