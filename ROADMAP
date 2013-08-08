@@ -2,9 +2,9 @@ TODO:
 
 ==== now
 
-README / COPYRIGHT / SCRIPTING
-
-==== beta?
+BUG: signal mask needs unsetting for children
+DAEMON: chdir to socket dir to not lock unnecessary filesystems
+DAEMON: setsid() when bg/server (which?), to not be hung up on
 
 don't killall script when main thread exits
 script killall notifies connected clients w/ error, removes connections from can't-autoquit list
