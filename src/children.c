@@ -53,6 +53,12 @@ static int run(lua_State *L) {
 	// we are the child at this point, set up enviroment
 	// ==================
 	
+	// reenable all signals
+	
+	sigset_t signalSet;
+	sigemptyset(&signalSet);
+	sigprocmask(SIG_SETMASK, &signalSet, NULL);
+	
 	// set user (if able to)
 	lua_getfield(L, 1, "user");
 	if(lua_isnumber(L, -1)) {
