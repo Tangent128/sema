@@ -124,6 +124,8 @@ if mode == "client" then
 	socket.detachServer()
 	control.main(action, select(argStartIndex, unpack(args)))
 elseif mode == "server" then
+	local _, socketDir = aux.absPath(socket.getSocketPath())
+	aux.chdir(socketDir)
 	supervise.main()
 elseif mode == "help" then
 	printHelp()

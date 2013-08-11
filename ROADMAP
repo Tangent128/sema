@@ -2,8 +2,6 @@ TODO:
 
 ==== now
 
-DAEMON: chdir to socket dir to not lock unnecessary filesystems
-
 flesh out ./config to be a better sample,w/ useInstalledLua and such
 
 don't killall script when main thread exits

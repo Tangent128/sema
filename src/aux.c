@@ -72,6 +72,16 @@ static int getUID(lua_State *L) {
 	return 1;
 }
 
+static int wrapChdir(lua_State *L) {
+
+	const char *dir = luaL_checkstring(L, 1);
+	
+	chdir(dir);
+	
+	return 0;
+}
+
+
 // accepts string for username, or number for UID
 // returns (uid, name, gid, home)
 static int userInfo(lua_State *L) {
@@ -103,6 +113,7 @@ static int userInfo(lua_State *L) {
 static const luaL_Reg auxFuncs[] = {
 	{ "modeFork", &modeFork },
 	{ "cAbsPath", &absPath},
+	{ "chdir", &wrapChdir},
 	{ "getUID", &getUID},
 	{ "userInfo", &userInfo},
 	{ NULL, NULL }
