@@ -2,7 +2,6 @@ TODO:
 
 ==== now
 
-DAEMON: setsid() when bg/server (which?), to not be hung up on
 DAEMON: chdir to socket dir to not lock unnecessary filesystems
 
 flesh out ./config to be a better sample,w/ useInstalledLua and such

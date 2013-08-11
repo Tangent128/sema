@@ -105,7 +105,7 @@ if mode == "spawn" then
 	else
 		-- need to fork to create server
 		
-		-- get server socket ready pre-fork to avoid 
+		-- get server socket ready pre-fork to avoid race conditions
 		socket.grabServerSocket()
 		
 		local process

@@ -34,6 +34,11 @@ static int modeFork(lua_State *L) {
 	}
 	
 	if(isChild) {
+		
+		// decisively detach from controlling terminal
+		setsid();
+		if(fork() != 0) exit(0);
+		
 		lua_pushstring(L, "child");
 	} else {
 		lua_pushstring(L, "parent");
