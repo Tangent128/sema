@@ -16,7 +16,6 @@ test "$4" && cd "$4"
 # get absolute target root
 ROOT=$(cd $ROOT ; pwd)
 
-echo $ROOT/config  $(vfind $ROOT/config.base) $PWD >&2
 # establish dependencies
 redo-ifchange $(vfind $ROOT/config.base)
 redo-ifchange $ROOT/config
@@ -43,6 +42,7 @@ LUADEP="$LUA"
 LUACDEP="$LUAC"
 
 # handy command ./config can run to clear dependency/use of included lua
+# (out of tree builds do not play nice with included lua, so you'll need this for them)
 useInstalledLua() {
 	LUADEP_INC=
 	LUADEP_LIB=

@@ -16,25 +16,27 @@ vfind() {
 		echo "$1"
 		return
 	fi
-	
-	# parse args
-	vpath_flag_ifchange=no
 
-	while true ; do
-		case "$1" in
-			"--ifchange")
-				vpath_flag_ifchange=yes
-				shift
-				;;
-			*)
-				break
-				;;
-		esac
-	done
-	
 	# see where we are relative to the root
 	vpath_dir="${PWD#$REDO_VPATH_TARGET}"
+
+	# results
+	vpath_results=
+	vpath_success=0
+
+	# loop over args	
+	while [ "$1" ] ; do
+		_debug "arg $1"
+		vpath_results="$vpath_results $(_vfind_file "$1")" || vpath_success=1
+		shift
+	done
 	
+	echo $vpath_results
+	_debug "$vpath_success $vpath_results"
+	return $vpath_success
+}
+
+_vfind_file() {
 	
 	# see if file actually exists already
 	# (or should only use for source-tree files?)
@@ -43,13 +45,27 @@ vfind() {
 	#	return
 	#fi
 	
+	# express source relative to the tree root
+	case $1 in
+		/*)
+			# was an absolute path
+			vpath_source=${1#$REDO_VPATH_TARGET}
+			;;
+		*)
+			# was a relative path
+			vpath_source="$vpath_dir/$1"
+			;;
+	esac
+	
+	_debug "finding $vpath_source"
+	
 	# search path
 	IFS=:
 	for path in $REDO_VPATH ; do
-		_debug "try $path/$vpath_dir/$1"
-		if [ -e "$path/$vpath_dir/$1" ] ; then
+		_debug "try $path/$vpath_source"
+		if [ -e "$path/$vpath_source" ] ; then
 			_debug "found $1"
-			echo "$path/$vpath_dir/$1"
+			echo "$path/$vpath_source"
 			return 0
 		fi
 	done

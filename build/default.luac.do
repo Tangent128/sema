@@ -1,5 +1,5 @@
 
 . ../config.base
 
-compileLua $ROOT/src/$2.lua
+compileLua $(vfind $ROOT/src/$2.lua)
 
