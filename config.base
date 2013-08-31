@@ -19,16 +19,16 @@ CC="gcc -Wall -c"
 LD="gcc -Wall"
 
 # lua/luac commands
-LUA=../liblua/lua
-LUAC="$ROOT/liblua/luac"
+LUA=$ROOT/liblua/lua
+LUAC="$ROOT/liblua/luac -s"
 
 # Libpath-related C flags
 LIBS="-llua -lm"
 
 # Lua dependencies
-LUADEP_INC="../liblua/lua.h ../liblua/lualib.h ../liblua/lauxlib.h ../liblua/luaconf.h"
+LUADEP_INC="$ROOT/liblua/lua.h $ROOT/liblua/lualib.h $ROOT/liblua/lauxlib.h $ROOT/liblua/luaconf.h"
 LUADEP_LIB="liblua/liblua.a"
-LUAINC="-I../liblua"
+LUAINC="-I$ROOT/liblua"
 LUALIB="-Lliblua"
 LUADEP="$LUA"
 LUACDEP="$LUAC"
@@ -42,7 +42,7 @@ useInstalledLua() {
 	LUADEP=
 	LUACDEP=
 	LUA=lua
-	LUAC=luac
+	LUAC="luac -s"
 }
 
 # utility functions, likely no need to edit
@@ -55,12 +55,12 @@ compileLua() {
 
 compileC() {
 	redo-ifchange $LUADEP_INC $*
-	$CC $LUAINC $* -o $OUTFILE
+	$CC "$LUAINC" $* -o $OUTFILE
 }
 
 link() {
 	redo-ifchange $LUADEP_LIB $*
-	$LD $LUALIB $* $LIBS -o $OUTFILE
+	$LD "$LUALIB" $* $LIBS -o $OUTFILE
 }
 
 # load custom config
