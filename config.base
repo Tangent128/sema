@@ -69,7 +69,7 @@ compileC() {
 
 link() {
 	redo-ifchange $LUADEP_LIB $*
-	$LD "$LUALIB" $* $LIBS -o $OUTFILE
+	$LD $LUALIB $* $LIBS -o $OUTFILE
 }
 
 # load custom config
