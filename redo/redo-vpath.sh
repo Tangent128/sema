@@ -111,6 +111,7 @@ vpath() { # $1 is target root directory (best if not .), followed by standard re
 	
 	echo "found dofile $dofile t=$target b=$base e=$ext" >&2
 	
+	redo-ifchange "$dofile"
 	_run_dofile "$target" "$base" "$3"
 }
 

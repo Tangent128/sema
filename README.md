@@ -86,14 +86,14 @@ If running as an ordinary user, `$XDG_RUNTIME_DIR/sema.socket` and `$HOME/.sema.
 Building
 --------
 
-`sema` uses the [Redo] build system; however, installing `redo` is not necessary, as a minimal always-rebuilds implementation is included under `src/do.sh`.
+`sema` uses the [Redo] build system; however, installing `redo` is not necessary, as a minimal always-rebuilds implementation is included under `redo/do.sh`.
 [Redo]: https://github.com/apenwarr/redo
 
 Building requires a libc and your distribution's basic build tools. (ie, 'build-essential' on Debian)
 
 From the root of the repository, run:
 
-`src/do.sh sema`
+`redo/do.sh sema`
 
 or
 
