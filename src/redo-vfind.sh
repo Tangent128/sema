@@ -14,8 +14,7 @@ vfind() {
 	vpath_flag_ifchange=no
 	vpath_flag_run=no
 
-	vpath_args=parsing
-	while [ $vpath_args = "parsing" ] ; do
+	while true ; do
 		case "$1" in
 			"--ifchange")
 				vpath_flag_ifchange=yes
@@ -77,29 +76,59 @@ _vfind_result() { # $1 = path, rest = command args
 
 # proxy a dofile search to the source trees, run it where it should
 vpath() { # $1 is target root directory (best if not .), followed by standard redo args
-	target="$1"
-	echo "looking to make $target ($2)" >&2
+	export REDO_VPATH_TARGET="$(readlink -m "$1")"
+	shift
 	
+	target="$1"
+	echo "looking to make $target ($2) in $REDO_VPATH_TARGET" >&2
+	
+	# make needed folders
+	targetDir="$REDO_VPATH_TARGET/${target%/*}"
+	echo $targetDir >&2
+	mkdir -p "$targetDir"
+	
+	# move into target folder
+	cd "$targetDir"
+	target="${target##*/}"
+	
+	#search
 	dofile=$target.do
 	base=$target
 	ext=
 	[ -e "$dofile" ] || _find_dofile "$target"
+	
 	if [ ! -e "$dofile" ]; then
+		# no file found
 		echo "no .do file found for $target" >&2
 		return 1
 	fi
-	echo "found dofile $dofile" >&2
+	
+	if [ "$dofile" -ef "$0" ]; then
+		# we just found the dofile that called us, don't loop
+		echo "no .do file found for $target" >&2
+		return 1
+	fi
+	
+	echo "found dofile $dofile t=$target b=$base e=$ext" >&2
+	
+	_run_dofile "$target" "$base" "$3"
 }
 
-# copied from minimal-do:
+# adapted from minimal-do:
 
 _find_dofile_pwd() {
 	dofile=default.$1.do
 	while :; do
 		dofile=default.${dofile#default.*.}
-		[ -e "$dofile" -o "$dofile" = default.do ] && break
+		echo "$(vfind "$dofile")" $dofile >&2
+		if vdofile="$(vfind "$dofile")" ; then
+			dofile="${vdofile}"
+			break
+		fi
+		[ "$dofile" = default.do ] && break
 	done
-	ext=${dofile#default}
+	ext=${dofile##*/}
+	ext=${ext#default}
 	ext=${ext%.do}
 	base=${1%$ext}
 }
@@ -119,18 +148,14 @@ _find_dofile() {
 	base=$prefix$base
 }
 
-#nix
 _run_dofile() {
-	export DO_DEPTH="$DO_DEPTH  "
-	export REDO_TARGET=$PWD/$target
-	local line1
 	set -e
-	read line1 <"$PWD/$dofile" || true
+	read line1 <"$dofile" || true
 	cmd=${line1#"#!/"}
 	if [ "$cmd" != "$line1" ]; then
-		/$cmd "$PWD/$dofile" "$@" >"$tmp.tmp2"
+		/$cmd "$dofile" "$@"
 	else
-		:; . "$PWD/$dofile" >"$tmp.tmp2"
+		:; . "$dofile"
 	fi
 }
 
