@@ -7,21 +7,23 @@
 # the $REDO_VPATH_TARGET environment variable, set by the call to vpath
 # in the catchall.
 
-# locate a file among the source and target trees, return its actual path
+# locate a file among the source and target trees, return its actual path;
+# only works properly when called from under the target tree
 vfind() {
+	
+	# if a in-tree build, nothing to look for
+	if [ ! "$REDO_VPATH_TARGET" ] ; then
+		echo "$1"
+		return
+	fi
 	
 	# parse args
 	vpath_flag_ifchange=no
-	vpath_flag_run=no
 
 	while true ; do
 		case "$1" in
 			"--ifchange")
 				vpath_flag_ifchange=yes
-				shift
-				;;
-			"--run")
-				vpath_flag_run=yes
 				shift
 				;;
 			*)
@@ -35,27 +37,26 @@ vfind() {
 	
 	
 	# see if file actually exists already
-	if [ -e "$1" ] ; then
-		_vfind_result "$1"
-		return
-	fi
+	# (or should only use for source-tree files?)
+	#if [ -e "$1" ] ; then
+	#	echo "$1"
+	#	return
+	#fi
 	
 	# search path
 	IFS=:
 	for path in $REDO_VPATH ; do
+		_debug "try $path/$vpath_dir/$1"
 		if [ -e "$path/$vpath_dir/$1" ] ; then
-			_vfind_result "$path/$vpath_dir/$1"
-			return
+			_debug "found $1"
+			echo "$path/$vpath_dir/$1"
+			return 0
 		fi
 	done
 	unset IFS
 	
 	# not found
-	if test $vpath_flag_ifchange = yes ; then
-		redo-ifchange "$1" && echo "$1"
-	else
-		exit 1
-	fi
+	return 1
 	
 }
 
@@ -66,25 +67,21 @@ vrun() {
 	"$( readlink -e "$vpath_cmd" )" "$@"
 }
 
-_vfind_result() { # $1 = path, rest = command args
-	if test $vpath_flag_ifchange = yes ; then
-		redo-ifchange "$1" || return
-	fi
-	
+_vfind_result() { # $1 = path
 	echo "$1"
 }
 
 # proxy a dofile search to the source trees, run it where it should
-vpath() { # $1 is target root directory (best if not .), followed by standard redo args
+vpath() { # $1 is target root directory, followed by standard redo args
 	export REDO_VPATH_TARGET="$(readlink -m "$1")"
 	shift
 	
 	target="$1"
-	echo "looking to make $target ($2) in $REDO_VPATH_TARGET" >&2
+	_debug "looking to make $target ($2) in $REDO_VPATH_TARGET"
 	
 	# make needed folders
-	targetDir="$REDO_VPATH_TARGET/${target%/*}"
-	echo $targetDir >&2
+	targetDir="$REDO_VPATH_TARGET/$(dirname "$target")"
+	_debug "targetDir $targetDir"
 	mkdir -p "$targetDir"
 	
 	# move into target folder
@@ -95,7 +92,7 @@ vpath() { # $1 is target root directory (best if not .), followed by standard re
 	dofile=$target.do
 	base=$target
 	ext=
-	[ -e "$dofile" ] || _find_dofile "$target"
+	dofile="$(vfind "$dofile")" || _find_dofile "$target"
 	
 	if [ ! -e "$dofile" ]; then
 		# no file found
@@ -109,10 +106,16 @@ vpath() { # $1 is target root directory (best if not .), followed by standard re
 		return 1
 	fi
 	
-	echo "found dofile $dofile t=$target b=$base e=$ext" >&2
+	_debug "found dofile $dofile t=$target b=$base e=$ext"
 	
+	# add dependency on dofile
 	redo-ifchange "$dofile"
-	_run_dofile "$target" "$base" "$3"
+	
+	# change to native directory
+	cd "$(dirname "$dofile")"
+	
+	# add nonstandard $4 = target file directory, for cd-ing back
+	_run_dofile "$target" "$base" "$REDO_VPATH_TARGET/$3" "$targetDir"
 }
 
 # adapted from minimal-do:
@@ -121,9 +124,8 @@ _find_dofile_pwd() {
 	dofile=default.$1.do
 	while :; do
 		dofile=default.${dofile#default.*.}
-		echo "$(vfind "$dofile")" $dofile >&2
 		if vdofile="$(vfind "$dofile")" ; then
-			dofile="${vdofile}"
+			dofile="$vdofile"
 			break
 		fi
 		[ "$dofile" = default.do ] && break
@@ -160,4 +162,8 @@ _run_dofile() {
 	fi
 }
 
+_debug() {
+	#echo "$1" >&2
+	:
+}
 

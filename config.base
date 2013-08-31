@@ -2,15 +2,24 @@
 # Initial configuration; variables like CC & LD
 # may be overriden in the generated ./config file
 
-# determine root of project
+# determine root level of project & load vfind
 ROOT=.
-while test ! -e $ROOT/config.base ; do
+while test ! -e $ROOT/redo/redo-vpath.sh ; do
 	ROOT="$ROOT/.."
 done
+
+. $ROOT/redo/redo-vpath.sh
+
+# vfind loaded, change to real target directory if relevant
+test "$4" && cd "$4"
+
+# get absolute target root
 ROOT=$(cd $ROOT ; pwd)
 
+echo $ROOT/config  $(vfind $ROOT/config.base) $PWD >&2
 # establish dependencies
-redo-ifchange $ROOT/config.base $ROOT/config
+redo-ifchange $(vfind $ROOT/config.base)
+redo-ifchange $ROOT/config
 
 # C compiler command
 CC="gcc -Wall -c"
@@ -55,7 +64,7 @@ compileLua() {
 
 compileC() {
 	redo-ifchange $LUADEP_INC $*
-	$CC "$LUAINC" $* -o $OUTFILE
+	$CC $LUAINC $* -o $OUTFILE
 }
 
 link() {
