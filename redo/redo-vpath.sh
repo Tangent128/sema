@@ -7,8 +7,8 @@
 # the $REDO_VPATH_TARGET environment variable, set by the call to vpath
 # in the catchall.
 
-# locate a file among the source and target trees, return its actual path;
-# only works properly when called from under the target tree
+# locate a file among the source trees, return its actual path;
+# only works properly when called from within the target tree
 vfind() {
 	
 	# if a in-tree build, nothing to look for
@@ -22,28 +22,21 @@ vfind() {
 
 	# results
 	vpath_results=
-	vpath_success=0
+	vpath_error=0
 
 	# loop over args	
 	while [ "$1" ] ; do
 		_debug "arg $1"
-		vpath_results="$vpath_results $(_vfind_file "$1")" || vpath_success=1
+		vpath_results="$vpath_results $(_vfind_file "$1")" || vpath_error=1
 		shift
 	done
 	
 	echo $vpath_results
 	_debug "$vpath_success $vpath_results"
-	return $vpath_success
+	return $vpath_error
 }
 
 _vfind_file() {
-	
-	# see if file actually exists already
-	# (or should only use for source-tree files?)
-	#if [ -e "$1" ] ; then
-	#	echo "$1"
-	#	return
-	#fi
 	
 	# express source relative to the tree root
 	case $1 in
@@ -76,18 +69,7 @@ _vfind_file() {
 	
 }
 
-# run a command, whether in the targets or sources
-vrun() {
-	vpath_cmd="$( vfind "$1" )" || return
-	shift
-	"$( readlink -e "$vpath_cmd" )" "$@"
-}
-
-_vfind_result() { # $1 = path
-	echo "$1"
-}
-
-# proxy a dofile search to the source trees, run it in the associated build tree folder
+# proxy a dofile search to the source trees, run it in the equivalent build tree folder
 vpath() { # $1 is target root directory, followed by standard redo args
 _debug "VPATH $*"
 	vpath_prefix="$1"
