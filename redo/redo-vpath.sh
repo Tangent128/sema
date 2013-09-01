@@ -87,13 +87,20 @@ _vfind_result() { # $1 = path
 	echo "$1"
 }
 
-# proxy a dofile search to the source trees, run it where it should
+# proxy a dofile search to the source trees, run it in the associated build tree folder
 vpath() { # $1 is target root directory, followed by standard redo args
-	export REDO_VPATH_TARGET="$(readlink -m "$1")"
+_debug "VPATH $*"
+	vpath_prefix="$1"
+	export REDO_VPATH_TARGET="$(readlink -m "$vpath_prefix")"
 	shift
 	
-	target="$1"
-	_debug "looking to make $target ($2) in $REDO_VPATH_TARGET"
+	# adjust $1 to get value relative to target root
+	target="${1#$vpath_prefix}"
+	target="${target#/}"
+	
+	# get absolute path to temporary target file
+	tmpTarget="$(readlink -m "$3")"
+	_debug "looking to make $target (as $tmpTarget) in $REDO_VPATH_TARGET"
 	
 	# make needed folders
 	targetDir="$REDO_VPATH_TARGET/$(dirname "$target")"
@@ -131,7 +138,7 @@ vpath() { # $1 is target root directory, followed by standard redo args
 	cd "$(dirname "$dofile")"
 	
 	# add nonstandard $4 = target file directory, for cd-ing back
-	_run_dofile "$target" "$base" "$REDO_VPATH_TARGET/$3" "$targetDir"
+	_run_dofile "$target" "$base" "$tmpTarget" "$targetDir"
 }
 
 # adapted from minimal-do:
