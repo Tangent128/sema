@@ -19,30 +19,30 @@ https://github.com/Tangent128/sema
 Usage
 -----
 
-`./sema --server`
+`sema --server`
 
 Launch a foreground server process, which can receive commands
 from future clients.
 
 
-`./sema --client scriptFile.sema [command [args...]]`
+`sema --client scriptFile.sema [command [args...]]`
 
 Connect to the server and ensure the script 'scriptFile.sema'
 is running; optionally send command and arguments to the script.
 
 
-`./sema scriptFile.sema [command [args...]]`
+`sema scriptFile.sema [command [args...]]`
 
 Like --client, but automatically spawn a background server if
 a server is not yet running.
 
 
-`./sema --ls`
+`sema --ls`
 
 List the server's currently loaded scripts, and PIDs of any daemons.
 
 	
-`./sema --kill scriptFile.sema`
+`sema --kill scriptFile.sema`
 
 Force-quit a script on the server and SIGKILL its daemons.
 
