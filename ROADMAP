@@ -2,7 +2,14 @@ TODO:
 
 ==== now
 
-flesh out ./config to be a better sample,w/ useInstalledLua and such
+create event.lua
+
+command queue feeds commands to script as handlers get noticed, to nix wonky "define handlers before first yield" behavior
+
+reevaluate rest of roadmap
+
+==== ???
+
 
 don't killall script when main thread exits
 script killall notifies connected clients w/ error, removes connections from can't-autoquit list
@@ -22,10 +29,13 @@ double check for error conditions/memory leaks/fd leaks
 
 add version to --help
 
+one.lua
+flesh out ./config to be a better sample,w/ useInstalledLua and such
+
 ==== v0.9
 
 env + "named" fds
-"use"
+"use" (needs message-passing and/or command calling?)
 wait for given time
 
 add default "quit" (or maybe "shutdown"?) command
