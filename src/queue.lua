@@ -167,7 +167,7 @@ end
 function wait_mt:removeThread(thread)
 	local blockedThreads = self.blocked[thread.waitKey]
 	blockedThreads[thread] = nil
-	if #self.blocked == 0 then
+	if #blockedThreads == 0 then
 		self.blocked[thread.waitKey] = nil
 	end
 end
