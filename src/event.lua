@@ -31,15 +31,14 @@ local dispatch_mt = {
 	__index = {
 		reset = function(self)
 			self.eventHandlers = {}
-			self.repeatHandlers = self.repeatHandlers or {}
 			self.errorHandlers = {}
 			-- self.constantEvent exists, if non-nil is fired anytime a listener is provided
 			-- self.constantError exists, if non-nil is fired anytime a listener is provided
+			-- self.queuedEvent may exist at times
 			return self
 		end,
 		fireEvent = function(self, ...)
 			dispatch(self.eventHandlers, ...)
-			dispatch(self.repeatHandlers, ...)
 			self:reset()
 		end,
 		fireError = function(self, ...)
@@ -81,7 +80,7 @@ end
 -- and returns the new value
 function event.queueFire(source, updater)
 	local dispatcher = grabDispatcher(source)
-	if next(dispatcher.eventHandlers) or next(dispatcher.repeatHandlers) then
+	if next(dispatcher.eventHandlers) then
 		dispatcher:fireEvent(updater(nil))
 	else
 		dispatcher.queuedEvent = updater(dispatcher.queuedEvent)
@@ -103,12 +102,6 @@ function event.onFire(source, callback)
 	
 	drainQueue(dispatcher)
 end
---[[ is this needed / even a good idea?
-function event.onEveryFire(source, callback)
-	local dispatcher = grabDispatcher(source)
-	dispatcher.repeatHandlers[callback] = callback
-	drainQueue(dispatcher)
-end]]
 function event.onFail(source, callback)
 	local dispatcher = grabDispatcher(source)
 	dispatcher.errorHandlers[callback] = callback
