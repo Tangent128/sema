@@ -10,6 +10,7 @@ reevaluate rest of roadmap
 
 ==== ???
 
+poll.lua can track reasons instead of poll.c?
 
 don't killall script when main thread exits
 script killall notifies connected clients w/ error, removes connections from can't-autoquit list

@@ -202,14 +202,17 @@ end
      Event functions
 --]]
 
+-- to-be deprecated
 function API.waitEvent(name)
 	current().script.events:waitOn(name)
 end
 
+-- to-be deprecated
 function API.triggerEvent(name)
 	current().script.events:resumeOn(name)
 end
 
+-- to-be deprecated
 function API.setEvent(name, on)
 	if on == nil then on = true end
 	
@@ -217,6 +220,71 @@ function API.setEvent(name, on)
 		current().script.events:resumeOnAndClear(name)
 	else
 		current().script.events:unClear(name)
+	end
+end
+
+local event_mt = {
+	__index = {
+		thenDo = function(self, eventHandler, errorHandler)
+			if event.isSource(self) then
+				if eventHandler then
+					event.onFire(self, eventHandler)
+				end
+				if errorHandler then
+					event.onFail(self, errorHandler)
+				end
+			end
+		end,
+		fire = function(self, ...)
+			if event.isSource(self) then
+				event.fire(self, ...)
+			end
+		end
+	}
+}
+event.markSource(event_mt)
+
+function API.Event()
+	return setmetatable({}, event_mt)
+end
+
+
+-- wait for an event to fire, and return any data passed with it
+function API.wait(source)
+	if event.isSource(source) then
+		local state = "unfired"
+		local current = queue.getActive()
+		local args
+		
+		event.onFire(source, function(...)
+			args = {...}
+			if state == "waiting" then
+				queue.activate(current)
+			end
+			state = "ok"
+		end)
+		event.onFail(source, function(...)
+			args = {...}
+			if state == "waiting" then
+				queue.activate(current)
+			end
+			state = "error"
+		end)
+		
+		if state == "unfired" then
+			state = "waiting"
+			--wait for events to wake us up
+			queue.deactivate(current)
+			queue.yield()
+		end
+		
+		if state == "error" then
+			error(unpack(args))
+		elseif state == "ok" then
+			return unpack(args)
+		else
+			error "impossible state"
+		end
 	end
 end
 

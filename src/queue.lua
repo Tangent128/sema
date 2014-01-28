@@ -41,11 +41,11 @@ local liveSet = {}
 --Threads that can run
 local activeSet = {}
 
-local function activate(thread)
+function queue.activate(thread)
 	activeSet[thread] = thread
 end
 
-local function deactivate(thread)
+function queue.deactivate(thread)
 	activeSet[thread] = nil
 
 	if thread.ready ~= false then
@@ -83,7 +83,7 @@ function queue.enqueue(thread)
 	end)
 	thread.coroutine = co
 	liveSet[thread] = thread
-	activate(thread)
+	queue.activate(thread)
 end
 
 -- assumption: the thread dispatch loop is non-reentrant
@@ -116,6 +116,9 @@ function queue.getActive()
 	return activeThread
 end
 
+-- for use by waiting threads
+queue.yield = coroutine.yield
+
 --[[
      Generic container for threads waiting on some event to resume.
      A waitSet identifies relevant events by some key, scheduling
@@ -138,7 +141,7 @@ function wait_mt:waitOn(key)
 	blocked[key][activeThread] = activeThread
 	activeThread.waitSet = self
 	activeThread.waitKey = key
-	deactivate(activeThread)
+	queue.deactivate(activeThread)
 	coroutine.yield() -- <== Coroutine jump here ===========
 end
 
@@ -149,7 +152,7 @@ function wait_mt:resumeOn(key, ...)
 			if self.resumeFunc then self.resumeFunc(thread, key, ...) end
 			thread.waitSet = nil
 			thread.waitKey = nil
-			activate(thread)
+			queue.activate(thread)
 		end
 		self.blocked[key] = nil
 	end
